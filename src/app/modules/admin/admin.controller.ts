@@ -14,7 +14,19 @@ const deleteUser = catchAsync(async (req, res) => {
   });
 });
 
+// ! for blocking a user
+const blockUser = catchAsync(async (req, res) => {
+  await adminService.blockUser(req.params.id);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "User blocked successfully!!!",
+  });
+});
+
 //
 export const adminController = {
   deleteUser,
+  blockUser,
 };

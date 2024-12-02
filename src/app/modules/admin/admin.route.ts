@@ -12,5 +12,12 @@ router.patch(
   adminController.deleteUser
 );
 
+// ! block a user
+router.patch(
+  "/block-user/:id",
+  validateUser(UserRole.ADMIN),
+  adminController.blockUser
+);
+
 //
 export const adminRouter = router;
