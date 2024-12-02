@@ -4,6 +4,7 @@ import { userRouter } from "../modules/user/user.route";
 import { authRouter } from "../modules/auth/auth.router";
 import { adminRouter } from "../modules/admin/admin.route";
 import { categoryRouter } from "../modules/category/category.route";
+import { shopRouter } from "../modules/shop/shop.route";
 
 const router = Router();
 
@@ -27,6 +28,10 @@ const routeArray = [
   {
     path: "/category",
     route: categoryRouter,
+  },
+  {
+    path: "/shop",
+    route: shopRouter,
   },
 ];
 

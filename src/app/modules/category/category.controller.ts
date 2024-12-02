@@ -34,7 +34,7 @@ const createCategory = catchAsync(async (req, res) => {
   sendResponse(res, {
     status: httpStatus.OK,
     success: true,
-    message: "Category added successfully!!!",
+    message: "Category crated successfully!!!",
     data: result,
   });
 });
