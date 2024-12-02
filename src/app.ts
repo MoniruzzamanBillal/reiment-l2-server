@@ -15,7 +15,7 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 
 // ! rouutes
-app.use("/api/v1", MainRouter);
+app.use("/api", MainRouter);
 
 app.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -29,6 +29,7 @@ app.get("/", async (req: Request, res: Response, next: NextFunction) => {
 app.use(globalErrorHandler);
 
 // ! not found route
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(httpStatus.NOT_FOUND).json({
     success: false,

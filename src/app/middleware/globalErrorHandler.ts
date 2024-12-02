@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ErrorRequestHandler } from "express";
 import { TerrorSource } from "../interface/error";
 import { handleCastError } from "../Error/handleCatError";
