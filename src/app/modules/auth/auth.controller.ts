@@ -34,7 +34,7 @@ const signIn = catchAsync(async (req, res) => {
     success: true,
     message: "User logged in successfully!!!",
     data: userData,
-    token: modifiedToken,
+    token: token,
   });
 });
 

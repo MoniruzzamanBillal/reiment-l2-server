@@ -2,6 +2,7 @@ import { Router } from "express";
 import { testRouter } from "../modules/boilerModule/test.route";
 import { userRouter } from "../modules/user/user.route";
 import { authRouter } from "../modules/auth/auth.router";
+import { adminRouter } from "../modules/admin/admin.route";
 
 const router = Router();
 
@@ -13,6 +14,10 @@ const routeArray = [
   {
     path: "/auth",
     route: authRouter,
+  },
+  {
+    path: "/admin",
+    route: adminRouter,
   },
   {
     path: "/user",
