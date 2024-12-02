@@ -21,5 +21,18 @@ router.post(
   productController.addProduct
 );
 
+// ! for updating product
+router.patch(
+  "/update-product/:id",
+  upload.single("prodImg"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
+  validateUser(UserRole.VENDOR),
+  validateRequest(productValidations.updateProductValidationSchema),
+  productController.updateProduct
+);
+
 //
 export const productRouter = router;

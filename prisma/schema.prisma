@@ -40,12 +40,12 @@ model Shop {
 }
 
 model Categories {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  isDelated Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Products  Products?
+  id        String     @id @default(uuid())
+  name      String     @unique
+  isDelated Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  products  Products[]
 
   @@map("categories")
 }
@@ -54,7 +54,7 @@ model Products {
   id             String     @id @default(uuid())
   shopId         String
   shop           Shop       @relation(fields: [shopId], references: [id])
-  categoryId     String     @unique
+  categoryId     String
   category       Categories @relation(fields: [categoryId], references: [id])
   name           String     @unique
   price          Decimal
@@ -62,6 +62,7 @@ model Products {
   inventoryCount Int
   discount       Decimal?
   productImg     String?
+  isDelated      Boolean    @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

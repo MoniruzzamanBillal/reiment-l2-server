@@ -15,7 +15,24 @@ const addProduct = catchAsync(async (req, res) => {
   });
 });
 
+// ! for crating a shop
+const updateProduct = catchAsync(async (req, res) => {
+  const result = await productServices.updateProduct(
+    req.body,
+    req.file,
+    req.params?.id
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Product updated successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const productController = {
   addProduct,
+  updateProduct,
 };

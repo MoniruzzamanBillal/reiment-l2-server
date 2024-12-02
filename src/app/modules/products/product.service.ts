@@ -36,7 +36,52 @@ const addProduct = async (payload: TShop, file: Partial<IFile> | undefined) => {
   return result;
 };
 
+// ! for updating product
+const updateProduct = async (
+  payload: Partial<TShop>,
+  file: Partial<IFile> | undefined,
+  prodId: string
+) => {
+  await prisma.products.findUniqueOrThrow({
+    where: {
+      id: prodId,
+      isDelated: false,
+    },
+  });
+
+  let updatedData;
+  if (file) {
+    const name = payload?.name?.trim() as string;
+    const path = file?.path?.trim() as string;
+
+    const cloudinaryResponse = await SendImageCloudinary(
+      path as string,
+      name as string
+    );
+    const productImg = cloudinaryResponse?.secure_url;
+
+    updatedData = {
+      ...payload,
+      productImg,
+    };
+  } else {
+    updatedData = {
+      ...payload,
+    };
+  }
+
+  const result = await prisma.products.update({
+    where: {
+      id: prodId,
+    },
+    data: updatedData,
+  });
+
+  return result;
+};
+
 //
 export const productServices = {
   addProduct,
+  updateProduct,
 };

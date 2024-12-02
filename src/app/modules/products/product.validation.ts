@@ -19,5 +19,26 @@ const addProductValidationSchema = z.object({
   }),
 });
 
+// ! for updating product
+const updateProductValidationSchema = z.object({
+  body: z.object({
+    name: z.string().min(1, "Name is required.").optional(),
+    price: z.number().positive("Price must be a positive number.").optional(),
+    description: z.string().min(1, "Description is required.").optional(),
+    inventoryCount: z
+      .number()
+      .int()
+      .nonnegative("Inventory count must be a non-negative integer.")
+      .optional(),
+    discount: z
+      .number()
+      .positive("Discount must be a positive number.")
+      .optional(),
+  }),
+});
+
 //
-export const productValidations = { addProductValidationSchema };
+export const productValidations = {
+  addProductValidationSchema,
+  updateProductValidationSchema,
+};
