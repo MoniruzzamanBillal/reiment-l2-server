@@ -43,5 +43,58 @@ const crateShop = async (
   return result;
 };
 
+//! update shop detail
+const updateShop = async (
+  payload: Partial<TShop>,
+  userId: string,
+  file: Partial<IFile> | undefined,
+  shopId: string
+) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId,
+      isDelated: false,
+      role: UserRole.VENDOR,
+    },
+  });
+
+  const shopData = await prisma.shop.findUniqueOrThrow({
+    where: {
+      id: shopId,
+      vendorId: user?.id,
+      isDelated: false,
+    },
+  });
+
+  let logo;
+
+  if (file) {
+    const name = user?.username;
+    const path = file?.path;
+
+    const cloudinaryResponse = await SendImageCloudinary(
+      path as string,
+      name as string
+    );
+    logo = cloudinaryResponse?.secure_url;
+  }
+
+  const updatedData = {
+    name: payload?.name,
+    description: payload?.description,
+    logo: file ? logo : shopData?.logo,
+  };
+
+  const result = await prisma.shop.update({
+    where: {
+      id: shopId,
+      vendorId: user?.id,
+    },
+    data: updatedData,
+  });
+
+  return result;
+};
+
 //
-export const shopServices = { crateShop };
+export const shopServices = { crateShop, updateShop };

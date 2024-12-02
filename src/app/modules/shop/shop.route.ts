@@ -18,5 +18,17 @@ router.post(
   shopController.crateShop
 );
 
+// ! for crating a shop
+router.patch(
+  "/update-shop/:id",
+  upload.single("logo"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
+  validateUser(UserRole.VENDOR),
+  shopController.updateShopData
+);
+
 //
 export const shopRouter = router;

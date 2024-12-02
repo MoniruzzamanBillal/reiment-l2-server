@@ -19,7 +19,25 @@ const crateShop = catchAsync(async (req, res) => {
   });
 });
 
+// ! for updating shop data
+const updateShopData = catchAsync(async (req, res) => {
+  const result = await shopServices.updateShop(
+    req.body,
+    req.user?.userId,
+    req.file,
+    req.params?.id
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Shop updated successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const shopController = {
   crateShop,
+  updateShopData,
 };
