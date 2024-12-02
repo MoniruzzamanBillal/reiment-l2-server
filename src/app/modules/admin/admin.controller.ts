@@ -25,8 +25,20 @@ const blockUser = catchAsync(async (req, res) => {
   });
 });
 
+// ! for blocking shop
+const blockShop = catchAsync(async (req, res) => {
+  await adminService.blockVendorShop(req.params.id);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Shop blocked successfully!!!",
+  });
+});
+
 //
 export const adminController = {
   deleteUser,
   blockUser,
+  blockShop,
 };

@@ -18,6 +18,12 @@ router.patch(
   validateUser(UserRole.ADMIN),
   adminController.blockUser
 );
+// ! block shop
+router.patch(
+  "/block-shop/:id",
+  validateUser(UserRole.ADMIN),
+  adminController.blockShop
+);
 
 //
 export const adminRouter = router;
