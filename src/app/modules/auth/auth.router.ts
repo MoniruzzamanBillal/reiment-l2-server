@@ -6,6 +6,13 @@ import { userValidations } from "../user/user.validation";
 
 const router = Router();
 
+// ! for login
+router.post(
+  "/log-in",
+  validateRequest(userValidations.loginValidationSchema),
+  authController.signIn
+);
+
 // ! for crating a user
 router.post(
   "/create-user",

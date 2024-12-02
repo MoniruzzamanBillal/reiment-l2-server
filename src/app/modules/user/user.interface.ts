@@ -9,3 +9,8 @@ export type TUser = {
   role: UserRole;
   status: UserStatus;
 };
+
+export type TLogin = {
+  email: string;
+  password: string;
+};
