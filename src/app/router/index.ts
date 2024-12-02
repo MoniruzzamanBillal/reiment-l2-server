@@ -5,6 +5,7 @@ import { authRouter } from "../modules/auth/auth.router";
 import { adminRouter } from "../modules/admin/admin.route";
 import { categoryRouter } from "../modules/category/category.route";
 import { shopRouter } from "../modules/shop/shop.route";
+import { productRouter } from "../modules/products/product.route";
 
 const router = Router();
 
@@ -32,6 +33,10 @@ const routeArray = [
   {
     path: "/shop",
     route: shopRouter,
+  },
+  {
+    path: "/product",
+    route: productRouter,
   },
 ];
 
