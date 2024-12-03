@@ -19,6 +19,7 @@ model User {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   shop       Shop?
+  cart       Cart?
 
   @@map("users")
 }
@@ -35,6 +36,7 @@ model Shop {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   Products    Products[]
+  cart        Cart?
 
   @@map("shop")
 }
@@ -64,10 +66,43 @@ model Products {
   productImg     String?
   isDelated      Boolean    @default(false)
 
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  cartItem  CartItem[]
+
+  @@map("products")
+}
+
+model Cart {
+  id         String  @id @default(uuid())
+  customerId String  @unique
+  user       User    @relation(fields: [customerId], references: [id])
+  vendorId   String? @unique
+  vendor     Shop?   @relation(fields: [vendorId], references: [id])
+
+  isDelated Boolean @default(false)
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  cartItem  CartItem[]
+
+  @@map("cart")
+}
+
+model CartItem {
+  id     String @id @default(uuid())
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id])
+
+  productId String
+  product   Products @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Decimal
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("products")
+  @@unique([cartId, productId])
+  @@map("cartItem")
 }
 
 enum UserRole {

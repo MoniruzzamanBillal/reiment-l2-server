@@ -6,6 +6,7 @@ import { adminRouter } from "../modules/admin/admin.route";
 import { categoryRouter } from "../modules/category/category.route";
 import { shopRouter } from "../modules/shop/shop.route";
 import { productRouter } from "../modules/products/product.route";
+import { cartRouter } from "../modules/cart/cart.route";
 
 const router = Router();
 
@@ -37,6 +38,10 @@ const routeArray = [
   {
     path: "/product",
     route: productRouter,
+  },
+  {
+    path: "/cart",
+    route: cartRouter,
   },
 ];
 
