@@ -56,7 +56,7 @@ model Products {
   shop           Shop       @relation(fields: [shopId], references: [id])
   categoryId     String
   category       Categories @relation(fields: [categoryId], references: [id])
-  name           String     @unique
+  name           String
   price          Decimal
   description    String
   inventoryCount Int

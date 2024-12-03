@@ -1,7 +1,11 @@
+import httpStatus from "http-status";
+import AppError from "../../Error/AppError";
 import { IFile } from "../../interface/file";
+
 import prisma from "../../util/prisma";
 import { SendImageCloudinary } from "../../util/SendImageCloudinary";
 import { TShop } from "./product.interface";
+import { JwtPayload } from "jsonwebtoken";
 
 // ! for crating a product
 const addProduct = async (payload: TShop, file: Partial<IFile> | undefined) => {
@@ -46,6 +50,7 @@ const updateProduct = async (
     where: {
       id: prodId,
       isDelated: false,
+      shopId: payload?.shopId,
     },
   });
 
@@ -80,8 +85,32 @@ const updateProduct = async (
   return result;
 };
 
+// ! for deleting porduct
+const deleteProduct = async (prodId: string, vendorUser: JwtPayload) => {
+  const prodData = await prisma.products.findUniqueOrThrow({
+    where: { id: prodId, isDelated: false },
+    include: { shop: true },
+  });
+
+  if (vendorUser?.userId !== prodData?.shop?.vendorId) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Only owner can delete this prisuct !!"
+    );
+  }
+
+  await prisma.products.update({
+    where: {
+      id: prodId,
+      shopId: prodData?.shopId,
+    },
+    data: { isDelated: true },
+  });
+};
+
 //
 export const productServices = {
   addProduct,
   updateProduct,
+  deleteProduct,
 };
