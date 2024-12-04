@@ -8,7 +8,6 @@ const addToCart = async (payload: TCart, userId: string) => {
   // check for product
   const productData = await prisma.products.findUnique({
     where: { id: payload?.productId, isDelated: false },
-    include: { shop: true },
   });
 
   if (!productData) {
@@ -29,13 +28,13 @@ const addToCart = async (payload: TCart, userId: string) => {
     cartData = await prisma.cart.create({
       data: {
         customerId: userId,
-        vendorId: productData?.shop?.id,
+        vendorId: productData?.shopId,
       },
     });
   }
 
   // Ensure single vendor per cart
-  if (cartData.vendorId !== productData.shop.id) {
+  if (cartData.vendorId !== productData.shopId) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "You can only add products from a single vendor to the cart."
@@ -64,7 +63,6 @@ const replaceCart = async (payload: TReplaceCart) => {
   // check for product
   const productData = await prisma.products.findUnique({
     where: { id: payload?.productId, isDelated: false },
-    include: { shop: true },
   });
 
   if (!productData) {
@@ -76,7 +74,7 @@ const replaceCart = async (payload: TReplaceCart) => {
   // update new vendor
   await prisma.cart.update({
     where: { id: payload.cartId },
-    data: { vendorId: productData?.shop?.id },
+    data: { vendorId: productData?.shopId },
   });
 
   // Add the new product to the cartItem
@@ -97,7 +95,11 @@ const getCartData = async (userId: string) => {
       customerId: userId,
       isDelated: false,
     },
-    include: { cartItem: true },
+    include: {
+      cartItem: {
+        include: { product: true },
+      },
+    },
   });
 
   return cartData;
