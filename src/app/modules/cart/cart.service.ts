@@ -20,7 +20,7 @@ const addToCart = async (payload: TCart, userId: string) => {
 
   // check for cart data
   let cartData = await prisma.cart.findUnique({
-    where: { customerId: userId },
+    where: { customerId: userId, isDelated: false },
   });
 
   // for no cart data , create cart data
@@ -109,6 +109,9 @@ const getCartData = async (userId: string) => {
 const deleteCartItem = async (payload: TDeleteCartItem, userId: string) => {
   const cartData = await prisma.cart.findUnique({
     where: { id: payload.cartId, customerId: userId },
+    include: {
+      cartItem: true,
+    },
   });
 
   const cartItemData = await prisma.cartItem.findUnique({
@@ -123,11 +126,29 @@ const deleteCartItem = async (payload: TDeleteCartItem, userId: string) => {
     throw new AppError(httpStatus.BAD_REQUEST, "Cart item not found");
   }
 
-  await prisma.cartItem.delete({
-    where: {
-      id: payload?.cartItemId,
-      cartId: payload.cartId,
-    },
+  prisma.$transaction(async (trxnClient) => {
+    await trxnClient.cartItem.delete({
+      where: {
+        id: payload?.cartItemId,
+        cartId: payload.cartId,
+      },
+    });
+
+    const remainingCartItems = await trxnClient.cartItem.findMany({
+      where: { cartId: payload.cartId },
+    });
+
+    // if there is no cart item data , then delete cart
+    if ((remainingCartItems?.length as number) === 0) {
+      await trxnClient.cart.delete({
+        where: {
+          id: payload?.cartId,
+          customerId: userId,
+        },
+      });
+    }
+
+    //
   });
 
   //
