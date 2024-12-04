@@ -21,6 +21,7 @@ model User {
   shop       Shop?
   cart       Cart?
   order      Order[]
+  address    Address[]
 
   @@map("users")
 }
@@ -139,6 +140,22 @@ model OrderItem {
   updatedAt DateTime @updatedAt
 
   @@map("orderItem")
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  street     String
+  city       String
+  state      String
+  postalCode String
+  country    String
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("address")
 }
 
 enum UserRole {

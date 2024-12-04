@@ -9,6 +9,7 @@ import { productRouter } from "../modules/products/product.route";
 import { cartRouter } from "../modules/cart/cart.route";
 import { orderRouter } from "../modules/order/order.route";
 import { paymentRouter } from "../modules/payment/payment.route";
+import { addressRouter } from "../modules/address/address.route";
 
 const router = Router();
 
@@ -52,6 +53,10 @@ const routeArray = [
   {
     path: "/payment",
     route: paymentRouter,
+  },
+  {
+    path: "/address",
+    route: addressRouter,
   },
 ];
 

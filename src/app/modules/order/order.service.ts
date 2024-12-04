@@ -73,8 +73,6 @@ const orderItem = async (payload: { cartId: string }, userId: string) => {
       where: { id: userId },
     });
 
-    console.log(userData);
-
     // * initiate payment
     const tracsactionData = {
       transactionId: trxnNumber,
