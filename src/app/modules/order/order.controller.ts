@@ -11,6 +11,18 @@ const orderItem = catchAsync(async (req, res) => {
     status: httpStatus.OK,
     success: true,
     message: "Item  ordered successfully!!!",
+    data: result?.payment_url,
+  });
+});
+
+// ! for getting order
+const getUserOrder = catchAsync(async (req, res) => {
+  const result = await orderServices.getOrder(req.user?.userId);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Order retrived successfully!!!",
     data: result,
   });
 });
@@ -18,4 +30,5 @@ const orderItem = catchAsync(async (req, res) => {
 //
 export const orderController = {
   orderItem,
+  getUserOrder,
 };

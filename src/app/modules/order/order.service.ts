@@ -96,7 +96,19 @@ const orderItem = async (payload: { cartId: string }, userId: string) => {
   return result;
 };
 
+// ! for getting user order
+const getOrder = async (userId: string) => {
+  const result = await prisma.order.findMany({
+    where: {
+      customerId: userId,
+    },
+  });
+
+  return result;
+};
+
 //
 export const orderServices = {
   orderItem,
+  getOrder,
 };
