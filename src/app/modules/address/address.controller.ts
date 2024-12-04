@@ -15,7 +15,20 @@ const addAddress = catchAsync(async (req, res) => {
   });
 });
 
+// ! get user address
+const getUserAddress = catchAsync(async (req, res) => {
+  const result = await addressService.getUserAddress(req.user?.userId);
+
+  sendResponse(res, {
+    status: httpStatus.CREATED,
+    success: true,
+    message: "Address retrived successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const addressController = {
   addAddress,
+  getUserAddress,
 };
