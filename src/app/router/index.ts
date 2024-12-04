@@ -7,6 +7,7 @@ import { categoryRouter } from "../modules/category/category.route";
 import { shopRouter } from "../modules/shop/shop.route";
 import { productRouter } from "../modules/products/product.route";
 import { cartRouter } from "../modules/cart/cart.route";
+import { orderRouter } from "../modules/order/order.route";
 
 const router = Router();
 
@@ -42,6 +43,10 @@ const routeArray = [
   {
     path: "/cart",
     route: cartRouter,
+  },
+  {
+    path: "/order",
+    route: orderRouter,
   },
 ];
 
