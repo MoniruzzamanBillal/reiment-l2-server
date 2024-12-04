@@ -27,8 +27,41 @@ const getUserAddress = catchAsync(async (req, res) => {
   });
 });
 
+// ! update  user address
+const updateUserAddress = catchAsync(async (req, res) => {
+  const result = await addressService.updateAddress(
+    req.body,
+    req.params.id,
+    req.user?.userId
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Address updated successfully!!!",
+    data: result,
+  });
+});
+
+// ! update  user address
+const deleteUserAddress = catchAsync(async (req, res) => {
+  const result = await addressService.deleteAddress(
+    req.params.id,
+    req.user?.userId
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Address deleted successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const addressController = {
   addAddress,
   getUserAddress,
+  updateUserAddress,
+  deleteUserAddress,
 };

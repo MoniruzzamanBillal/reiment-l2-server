@@ -20,5 +20,19 @@ router.post(
   addressController.addAddress
 );
 
+// ! for updating address
+router.patch(
+  "/update-address/:id",
+  validateUser(UserRole.ADMIN, UserRole.CUSTOMER, UserRole.VENDOR),
+  addressController.updateUserAddress
+);
+
+// ! for updating address
+router.patch(
+  "/delete-address/:id",
+  validateUser(UserRole.ADMIN, UserRole.CUSTOMER, UserRole.VENDOR),
+  addressController.deleteUserAddress
+);
+
 //
 export const addressRouter = router;

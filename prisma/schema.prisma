@@ -22,6 +22,7 @@ model User {
   cart       Cart?
   order      Order[]
   address    Address[]
+  review     Review[]
 
   @@map("users")
 }
@@ -72,6 +73,7 @@ model Products {
   updatedAt DateTime    @updatedAt
   cartItem  CartItem[]
   orderItem OrderItem[]
+  review    Review[]
 
   @@map("products")
 }
@@ -134,12 +136,31 @@ model OrderItem {
   quantity  Int
   price     Float
 
-  isDelated Boolean @default(false)
+  isDelated  Boolean @default(false)
+  isReviewed Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  review    Review?
+
+  @@map("orderItem")
+}
+
+model Review {
+  id          String    @id @default(uuid())
+  orderItemId String    @unique
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id])
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  productId   String
+  product     Products  @relation(fields: [productId], references: [id])
+  rating      Int
+  comment     String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("orderItem")
+  @@map("reviews")
 }
 
 model Address {
