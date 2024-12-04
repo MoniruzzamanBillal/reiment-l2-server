@@ -5,6 +5,17 @@ export type TCart = {
   quantity: number;
 };
 
+export type TReplaceCart = {
+  cartId: string;
+  productId: string;
+  quantity: number;
+};
+
+export type TDeleteCartItem = {
+  cartItemId: string;
+  cartId: string;
+};
+
 export type CartItem = {
   cartId: string;
   productId: string;
