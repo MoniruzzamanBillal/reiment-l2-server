@@ -36,7 +36,7 @@ model Shop {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   Products    Products[]
-  cart        Cart?
+  cart        Cart[]
 
   @@map("shop")
 }
@@ -77,7 +77,7 @@ model Cart {
   id         String  @id @default(uuid())
   customerId String  @unique
   user       User    @relation(fields: [customerId], references: [id])
-  vendorId   String? @unique
+  vendorId   String?
   vendor     Shop?   @relation(fields: [vendorId], references: [id])
 
   isDelated Boolean @default(false)
