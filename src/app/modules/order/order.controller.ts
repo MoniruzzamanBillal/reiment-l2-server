@@ -5,7 +5,7 @@ import { orderServices } from "./order.service";
 
 // ! for ordering
 const orderItem = catchAsync(async (req, res) => {
-  const result = await orderServices.orderItem();
+  const result = await orderServices.orderItem(req.body, req.user?.userId);
 
   sendResponse(res, {
     status: httpStatus.OK,

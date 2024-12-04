@@ -60,10 +60,10 @@ model Products {
   categoryId     String
   category       Categories @relation(fields: [categoryId], references: [id])
   name           String
-  price          Decimal
+  price          Float
   description    String
   inventoryCount Int
-  discount       Decimal?
+  discount       Float?
   productImg     String?
   isDelated      Boolean    @default(false)
 
@@ -99,7 +99,7 @@ model CartItem {
   productId String
   product   Products @relation(fields: [productId], references: [id])
   quantity  Int
-  price     Decimal
+  price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -111,7 +111,7 @@ model Order {
   id         String      @id @default(uuid())
   customerId String
   customer   User        @relation(fields: [customerId], references: [id])
-  totalPrice Decimal     @db.Decimal(10, 2)
+  totalPrice Float
   status     OrderStatus @default(PENDING)
 
   isDelated Boolean @default(false)
@@ -130,7 +130,7 @@ model OrderItem {
   productId String
   product   Products @relation(fields: [productId], references: [id])
   quantity  Int
-  price     Decimal  @db.Decimal(10, 2)
+  price     Float
 
   isDelated Boolean @default(false)
 
