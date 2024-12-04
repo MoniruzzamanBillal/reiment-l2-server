@@ -114,7 +114,8 @@ model Order {
   totalPrice Float
   status     OrderStatus @default(PENDING)
 
-  isDelated Boolean @default(false)
+  isDelated  Boolean @default(false)
+  trxnNumber String? @unique
 
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt

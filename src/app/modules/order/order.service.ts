@@ -1,10 +1,13 @@
 import httpStatus from "http-status";
 import AppError from "../../Error/AppError";
 import prisma from "../../util/prisma";
+import { initiatePayment } from "../payment/payment.util";
 
 // ! for ordering product
 const orderItem = async (payload: { cartId: string }, userId: string) => {
   const { cartId } = payload;
+  const trxnNumber = `TXN-${Date.now()}`;
+
   // get cart items
   const cartItems = await prisma.cartItem.findMany({
     where: { cartId: cartId },
@@ -25,6 +28,7 @@ const orderItem = async (payload: { cartId: string }, userId: string) => {
       data: {
         customerId: userId,
         totalPrice,
+        trxnNumber,
       },
     });
 
@@ -46,13 +50,47 @@ const orderItem = async (payload: { cartId: string }, userId: string) => {
       },
     });
 
+    // delete cart
     await trxnClient.cart.delete({
       where: {
         id: cartId,
       },
     });
 
-    return order;
+    // reduce product inventory quantity
+    for (const item of cartItems) {
+      await trxnClient.products.update({
+        where: { id: item?.productId },
+        data: {
+          inventoryCount: {
+            decrement: item?.quantity,
+          },
+        },
+      });
+    }
+
+    const userData = await trxnClient.user.findUnique({
+      where: { id: userId },
+    });
+
+    console.log(userData);
+
+    // * initiate payment
+    const tracsactionData = {
+      transactionId: trxnNumber,
+      amount: totalPrice as number,
+      customerName: userData?.username as string,
+      customerEmail: userData?.email as string,
+      userId: userId,
+    };
+
+    const transactionResult = await initiatePayment(tracsactionData);
+
+    if (transactionResult?.tran_id) {
+      throw new AppError(httpStatus.BAD_REQUEST, transactionResult?.tran_id);
+    }
+
+    return transactionResult;
   });
 
   return result;
