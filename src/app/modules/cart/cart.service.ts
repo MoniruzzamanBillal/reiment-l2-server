@@ -122,6 +122,15 @@ const deleteCartItem = async (payload: TDeleteCartItem, userId: string) => {
   if (!cartItemData) {
     throw new AppError(httpStatus.BAD_REQUEST, "Cart item not found");
   }
+
+  await prisma.cartItem.delete({
+    where: {
+      id: payload?.cartItemId,
+      cartId: payload.cartId,
+    },
+  });
+
+  //
 };
 
 //
