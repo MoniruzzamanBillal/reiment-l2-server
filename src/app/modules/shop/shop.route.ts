@@ -6,6 +6,13 @@ import { upload } from "../../util/SendImageCloudinary";
 
 const router = Router();
 
+// ! for getting all shop data
+router.get(
+  "/all-shop-data",
+  validateUser(UserRole.ADMIN),
+  shopController.getAllShopData
+);
+
 // ! for crating a shop
 router.post(
   "/create-shop",

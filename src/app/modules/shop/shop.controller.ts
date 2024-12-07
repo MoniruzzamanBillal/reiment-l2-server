@@ -36,8 +36,21 @@ const updateShopData = catchAsync(async (req, res) => {
   });
 });
 
+// ! for getting all shop data
+const getAllShopData = catchAsync(async (req, res) => {
+  const result = await shopServices.getAllShopData();
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Shop Data retrived successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const shopController = {
   crateShop,
   updateShopData,
+  getAllShopData,
 };

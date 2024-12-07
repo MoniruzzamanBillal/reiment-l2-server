@@ -23,6 +23,7 @@ model User {
   order      Order[]
   address    Address[]
   review     Review[]
+  follower   Follower[]
 
   @@map("users")
 }
@@ -40,6 +41,7 @@ model Shop {
   updatedAt   DateTime   @updatedAt
   Products    Products[]
   cart        Cart[]
+  follower    Follower[]
 
   @@map("shop")
 }
@@ -177,6 +179,20 @@ model Address {
   updatedAt  DateTime @updatedAt
 
   @@map("address")
+}
+
+model Follower {
+  id         String @id @default(cuid())
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id])
+  shopId     String
+  shop       Shop   @relation(fields: [shopId], references: [id])
+
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("follower")
 }
 
 enum UserRole {

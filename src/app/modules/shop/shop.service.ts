@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { ShopStatus, UserRole } from "@prisma/client";
 import prisma from "../../util/prisma";
 import { TShop } from "./shop.interface";
 import { IFile } from "../../interface/file";
@@ -96,5 +96,26 @@ const updateShop = async (
   return result;
 };
 
+// ! for getting all shop data
+const getAllShopData = async () => {
+  const result = await prisma.shop.findMany({
+    where: {
+      status: ShopStatus.ACTIVE,
+      isDelated: false,
+    },
+    include: {
+      vendor: {
+        select: {
+          username: true,
+          email: true,
+          profileImg: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
 //
-export const shopServices = { crateShop, updateShop };
+export const shopServices = { crateShop, updateShop, getAllShopData };
