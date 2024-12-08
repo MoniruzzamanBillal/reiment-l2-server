@@ -21,6 +21,9 @@ router.post(
   productController.addProduct
 );
 
+// ! for getting vendor shop's product
+router.get("/get-vendor-product/:id", productController.getVendorShopProducts);
+
 // ! for updating product
 router.patch(
   "/update-product/:id",

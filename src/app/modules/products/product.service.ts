@@ -108,9 +108,26 @@ const deleteProduct = async (prodId: string, vendorUser: JwtPayload) => {
   });
 };
 
+// ! for getting vendor product
+const getVendorProduct = async (shopId: string) => {
+  const result = await prisma.products.findMany({
+    where: {
+      shopId: shopId,
+      isDelated: false,
+    },
+    include: {
+      shop: true,
+      category: true,
+    },
+  });
+
+  return result;
+};
+
 //
 export const productServices = {
   addProduct,
   updateProduct,
   deleteProduct,
+  getVendorProduct,
 };
