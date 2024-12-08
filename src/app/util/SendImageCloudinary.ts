@@ -13,8 +13,8 @@ cloudinary.config({
 export const SendImageCloudinary = async (path: string, name: string) => {
   // Upload an image
   const uploadResult = await cloudinary.uploader
-    .upload(path, {
-      public_id: name,
+    .upload(path.trim(), {
+      public_id: name.trim(),
     })
     .catch((error) => {
       console.log(error);

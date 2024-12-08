@@ -13,6 +13,13 @@ router.get(
   shopController.getAllShopData
 );
 
+// ! for getting vendor shop data
+router.get(
+  "/vendor-shop",
+  validateUser(UserRole.VENDOR),
+  shopController.getVendorShop
+);
+
 // ! for crating a shop
 router.post(
   "/create-shop",
@@ -25,7 +32,7 @@ router.post(
   shopController.crateShop
 );
 
-// ! for crating a shop
+// ! for updating a shop
 router.patch(
   "/update-shop/:id",
   upload.single("logo"),

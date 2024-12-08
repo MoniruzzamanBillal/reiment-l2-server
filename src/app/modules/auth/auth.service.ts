@@ -21,8 +21,8 @@ const createUser = async (
   let profileImg;
 
   if (file) {
-    const name = payload?.username;
-    const path = file?.path;
+    const name = payload?.username.trim();
+    const path = (file?.path as string).trim();
 
     const cloudinaryResponse = await SendImageCloudinary(
       path as string,
