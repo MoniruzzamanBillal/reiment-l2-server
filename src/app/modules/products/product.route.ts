@@ -24,6 +24,9 @@ router.post(
 // ! for getting vendor shop's product
 router.get("/get-vendor-product/:id", productController.getVendorShopProducts);
 
+// ! for getting single product
+router.get("/get-product/:id", productController.getSingleProduct);
+
 // ! for updating product
 router.patch(
   "/update-product/:id",

@@ -44,7 +44,6 @@ const deleteProduct = catchAsync(async (req, res) => {
 
 // ! for getting vendor shops product
 const getVendorShopProducts = catchAsync(async (req, res) => {
-  console.log(req.params?.id);
   const result = await productServices.getVendorProduct(req.params?.id);
 
   sendResponse(res, {
@@ -55,10 +54,23 @@ const getVendorShopProducts = catchAsync(async (req, res) => {
   });
 });
 
+// ! for getting single product
+const getSingleProduct = catchAsync(async (req, res) => {
+  const result = await productServices.getSingleProduct(req.params?.id);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: " Product retrived successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const productController = {
   addProduct,
   updateProduct,
   deleteProduct,
   getVendorShopProducts,
+  getSingleProduct,
 };

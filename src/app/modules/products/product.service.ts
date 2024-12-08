@@ -124,10 +124,23 @@ const getVendorProduct = async (shopId: string) => {
   return result;
 };
 
+// ! for getting single product
+const getSingleProduct = async (prodId: string) => {
+  const result = await prisma.products.findUnique({
+    where: {
+      id: prodId,
+      isDelated: false,
+    },
+  });
+
+  return result;
+};
+
 //
 export const productServices = {
   addProduct,
   updateProduct,
   deleteProduct,
   getVendorProduct,
+  getSingleProduct,
 };
