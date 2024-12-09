@@ -8,6 +8,9 @@ import { productValidations } from "./product.validation";
 
 const router = Router();
 
+// ! for getting all product
+router.get("/all-products", productController.getAllProducts);
+
 // ! for adding product
 router.post(
   "/add-product",

@@ -54,6 +54,18 @@ const getVendorShopProducts = catchAsync(async (req, res) => {
   });
 });
 
+// ! for getting all products data
+const getAllProducts = catchAsync(async (req, res) => {
+  const result = await productServices.getAllProducts();
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: " Products retrived successfully!!!",
+    data: result,
+  });
+});
+
 // ! for getting single product
 const getSingleProduct = catchAsync(async (req, res) => {
   const result = await productServices.getSingleProduct(req.params?.id);
@@ -73,4 +85,5 @@ export const productController = {
   deleteProduct,
   getVendorShopProducts,
   getSingleProduct,
+  getAllProducts,
 };

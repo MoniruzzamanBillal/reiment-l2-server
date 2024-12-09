@@ -124,6 +124,17 @@ const getVendorProduct = async (shopId: string) => {
   return result;
 };
 
+// ! for getting all product data
+const getAllProducts = async () => {
+  const result = await prisma.products.findMany({
+    where: {
+      isDelated: false,
+    },
+  });
+
+  return result;
+};
+
 // ! for getting single product
 const getSingleProduct = async (prodId: string) => {
   const result = await prisma.products.findUnique({
@@ -152,4 +163,5 @@ export const productServices = {
   deleteProduct,
   getVendorProduct,
   getSingleProduct,
+  getAllProducts,
 };
