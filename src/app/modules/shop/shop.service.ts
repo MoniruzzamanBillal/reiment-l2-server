@@ -31,8 +31,6 @@ const crateShop = async (
     shopLogo = cloudinaryResponse?.secure_url;
   }
 
-  console.log(shopLogo);
-
   const result = await prisma.shop.create({
     data: {
       vendorId: user?.id,
@@ -131,10 +129,27 @@ const getVendorShop = async (userId: string) => {
   return result;
 };
 
+// ! for getting single shop data
+const getSingleShop = async (shopId: string) => {
+  const result = await prisma.shop.findUnique({
+    where: {
+      id: shopId,
+      status: ShopStatus.ACTIVE,
+    },
+    include: {
+      Products: true,
+      follower: true,
+    },
+  });
+
+  return result;
+};
+
 //
 export const shopServices = {
   crateShop,
   updateShop,
   getAllShopData,
   getVendorShop,
+  getSingleShop,
 };

@@ -60,10 +60,23 @@ const getVendorShop = catchAsync(async (req, res) => {
   });
 });
 
+// ! for getting single shop data
+const getSingleShop = catchAsync(async (req, res) => {
+  const result = await shopServices.getSingleShop(req.params?.id);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: " Shop Data retrived successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const shopController = {
   crateShop,
   updateShopData,
   getAllShopData,
   getVendorShop,
+  getSingleShop,
 };

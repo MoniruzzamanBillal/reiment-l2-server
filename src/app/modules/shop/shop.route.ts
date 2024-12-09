@@ -32,6 +32,9 @@ router.post(
   shopController.crateShop
 );
 
+// ! for getting single shop data
+router.get("/shop-detail/:id", shopController.getSingleShop);
+
 // ! for updating a shop
 router.patch(
   "/update-shop/:id",

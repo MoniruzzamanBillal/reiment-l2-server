@@ -131,6 +131,15 @@ const getSingleProduct = async (prodId: string) => {
       id: prodId,
       isDelated: false,
     },
+    include: {
+      category: true,
+      shop: true,
+      review: {
+        include: {
+          user: true,
+        },
+      },
+    },
   });
 
   return result;

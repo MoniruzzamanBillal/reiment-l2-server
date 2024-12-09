@@ -1,11 +1,13 @@
 import catchAsync from "../../util/catchAsync";
 import { paymentServices } from "./payment.service";
 
-const redirectURL = "http://localhost:3000";
+const redirectURL = "http://localhost:5173";
 
 // ! for verify payment
 const verifyPayment = catchAsync(async (req, res) => {
   const { transactionId, userId } = req.query;
+
+  console.log(userId);
 
   const result = await paymentServices.verifyPayment(transactionId as string);
 
@@ -14,7 +16,7 @@ const verifyPayment = catchAsync(async (req, res) => {
   }
 
   if (result) {
-    return res.redirect(`${redirectURL}/payment-confirm/${userId}`);
+    return res.redirect(`${redirectURL}/order-success`);
   } else {
     throw new Error("Payment unsuccessfull");
   }
