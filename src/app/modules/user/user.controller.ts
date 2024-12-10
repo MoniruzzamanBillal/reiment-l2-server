@@ -14,5 +14,17 @@ const getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
+// ! get logged in user
+const getLoggedInUser = catchAsync(async (req, res) => {
+  const result = await userServices.getLoggedInUser(req.user?.userId);
+
+  sendResponse(res, {
+    status: httpStatus.CREATED,
+    success: true,
+    message: "User Retrived successfully!!!",
+    data: result,
+  });
+});
+
 //
-export const userController = { getAllUsers };
+export const userController = { getAllUsers, getLoggedInUser };

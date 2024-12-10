@@ -12,5 +12,12 @@ router.get(
   userController.getAllUsers
 );
 
+// ! for getting logged in user
+router.get(
+  "/logged-user",
+  validateUser(UserRole.ADMIN, UserRole.CUSTOMER, UserRole.VENDOR),
+  userController.getLoggedInUser
+);
+
 //
 export const userRouter = router;
