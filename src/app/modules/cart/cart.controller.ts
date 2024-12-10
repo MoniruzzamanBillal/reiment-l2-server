@@ -48,10 +48,34 @@ const deleteCartItem = catchAsync(async (req, res) => {
   });
 });
 
+// ! for updating cart quantity
+const updateCartQuantity = catchAsync(async (req, res) => {
+  await cartServices.addCartQuantity(req.body, req.user.userId);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "cart item incremented successfully!!!",
+  });
+});
+
+// ! for decreasing cart item quantity
+const decreaseCartQuantity = catchAsync(async (req, res) => {
+  await cartServices.decreaseCartQuantity(req.body, req.user.userId);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "cart item decrement successfully!!!",
+  });
+});
+
 //
 export const cartController = {
   addToCart,
   replaceCart,
   getCartData,
   deleteCartItem,
+  updateCartQuantity,
+  decreaseCartQuantity,
 };

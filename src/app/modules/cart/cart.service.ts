@@ -58,6 +58,118 @@ const addToCart = async (payload: TCart, userId: string) => {
   //
 };
 
+// ! for adding cart item quantity
+const addCartQuantity = async (payload: TCart, userId: string) => {
+  // check for product
+  const productData = await prisma.products.findUnique({
+    where: { id: payload?.productId, isDelated: false },
+  });
+
+  if (!productData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Product not found");
+  }
+
+  if (productData.inventoryCount < payload.quantity) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Insufficient inventory");
+  }
+
+  // check for cart data
+  const cartData = await prisma.cart.findUnique({
+    where: { customerId: userId, isDelated: false },
+  });
+
+  if (!cartData) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "No cart available for this user "
+    );
+  }
+
+  // Ensure single vendor per cart
+  if (cartData.vendorId !== productData.shopId) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You can only add products from a single vendor to the cart."
+    );
+  }
+
+  // increment cart data quantity
+  await prisma.cartItem.update({
+    where: {
+      cartId_productId: { cartId: cartData.id, productId: payload.productId },
+    },
+    data: {
+      quantity: {
+        increment: payload?.quantity,
+      },
+    },
+  });
+};
+
+// ! for decreasing cart item quantity
+const decreaseCartQuantity = async (payload: TCart, userId: string) => {
+  // check for product
+  const productData = await prisma.products.findUnique({
+    where: { id: payload?.productId, isDelated: false },
+  });
+
+  if (!productData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Product not found");
+  }
+
+  // check for cart data
+  const cartData = await prisma.cart.findUnique({
+    where: { customerId: userId, isDelated: false },
+  });
+
+  if (!cartData) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "No cart available for this user "
+    );
+  }
+
+  // Ensure single vendor per cart
+  if (cartData.vendorId !== productData.shopId) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You can only add products from a single vendor to the cart."
+    );
+  }
+
+  const cartItemData = await prisma.cartItem.findUnique({
+    where: {
+      cartId_productId: {
+        productId: payload?.productId,
+        cartId: cartData?.id,
+      },
+    },
+  });
+
+  if (!cartItemData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "No cart Item found  ");
+  }
+
+  if (cartItemData.quantity <= payload?.quantity) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You cann't reduce cart quantity !!!"
+    );
+  }
+
+  // decrement cart data quantity
+  await prisma.cartItem.update({
+    where: {
+      cartId_productId: { cartId: cartData.id, productId: payload.productId },
+    },
+    data: {
+      quantity: {
+        decrement: payload?.quantity,
+      },
+    },
+  });
+};
+
 // ! for replacing cart
 const replaceCart = async (payload: TReplaceCart) => {
   // check for product
@@ -160,4 +272,6 @@ export const cartServices = {
   replaceCart,
   getCartData,
   deleteCartItem,
+  addCartQuantity,
+  decreaseCartQuantity,
 };

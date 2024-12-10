@@ -19,7 +19,21 @@ router.post(
   cartController.addToCart
 );
 
-// ! for adding in cart
+// ! for increasing cart quantity
+router.patch(
+  "/increase-item-quantity",
+  validateUser(UserRole.CUSTOMER),
+  cartController.updateCartQuantity
+);
+
+// ! for decreasing cart quantity
+router.patch(
+  "/decrease-item-quantity",
+  validateUser(UserRole.CUSTOMER),
+  cartController.decreaseCartQuantity
+);
+
+// ! for replacing  cart item
 router.patch(
   "/replace-cart",
   validateUser(UserRole.CUSTOMER),
