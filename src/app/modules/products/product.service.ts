@@ -130,6 +130,10 @@ const getAllProducts = async () => {
     where: {
       isDelated: false,
     },
+    include: {
+      shop: true,
+      category: true,
+    },
   });
 
   return result;

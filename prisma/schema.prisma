@@ -47,12 +47,13 @@ model Shop {
 }
 
 model Categories {
-  id        String     @id @default(uuid())
-  name      String     @unique
-  isDelated Boolean    @default(false)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  products  Products[]
+  id          String     @id @default(uuid())
+  name        String     @unique
+  categoryImg String?
+  isDelated   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  products    Products[]
 
   @@map("categories")
 }
