@@ -240,6 +240,15 @@ const handleDuplicateProduct = async (payload: TShop) => {
   return result;
 };
 
+// ! for getting related products
+const getRelatedProducts = async (categoryId: string) => {
+  const result = await prisma.products.findMany({
+    where: { categoryId },
+    take: 5,
+  });
+  return result;
+};
+
 //
 export const productServices = {
   addProduct,
@@ -250,4 +259,5 @@ export const productServices = {
   getAllProducts,
   handleDuplicateProduct,
   getFlashSellProducts,
+  getRelatedProducts,
 };

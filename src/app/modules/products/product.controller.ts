@@ -78,6 +78,18 @@ const getFlashSaleProduct = catchAsync(async (req, res) => {
   });
 });
 
+// ! for category related products
+const getRelatedProducts = catchAsync(async (req, res) => {
+  const result = await productServices.getRelatedProducts(req.params?.id);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: " Products retrived successfully!!!",
+    data: result,
+  });
+});
+
 // ! for getting single product
 const getSingleProduct = catchAsync(async (req, res) => {
   const result = await productServices.getSingleProduct(req.params?.id);
@@ -112,4 +124,5 @@ export const productController = {
   getAllProducts,
   duplicateProduct,
   getFlashSaleProduct,
+  getRelatedProducts,
 };

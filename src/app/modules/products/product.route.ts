@@ -37,6 +37,9 @@ router.post(
 // ! for getting vendor shop's product
 router.get("/get-vendor-product/:id", productController.getVendorShopProducts);
 
+// ! for getting vendor shop's product
+router.get("/get-related-products/:id", productController.getRelatedProducts);
+
 // ! for getting single product
 router.get("/get-product/:id", productController.getSingleProduct);
 
