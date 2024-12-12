@@ -26,5 +26,7 @@ const getLoggedInUser = catchAsync(async (req, res) => {
   });
 });
 
+// ! for updating a user
+
 //
 export const userController = { getAllUsers, getLoggedInUser };

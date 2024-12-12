@@ -15,6 +15,22 @@ const crateUser = catchAsync(async (req, res) => {
   });
 });
 
+// ! for updating a user
+const updateUser = catchAsync(async (req, res) => {
+  const result = await authServices.updateUser(
+    req.body,
+    req.file,
+    req.user?.userId
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "User updated successfully!!!",
+    data: result,
+  });
+});
+
 // ! for login
 const signIn = catchAsync(async (req, res) => {
   const result = await authServices.login(req.body);
@@ -42,4 +58,5 @@ const signIn = catchAsync(async (req, res) => {
 export const authController = {
   crateUser,
   signIn,
+  updateUser,
 };

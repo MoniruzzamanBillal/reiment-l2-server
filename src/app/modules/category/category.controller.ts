@@ -3,6 +3,19 @@ import catchAsync from "../../util/catchAsync";
 import sendResponse from "../../util/sendResponse";
 import { categoryServices } from "./category.service";
 
+// ! for crating category
+const createCategory = catchAsync(async (req, res) => {
+  console.log(req.file);
+  const result = await categoryServices.addCategory(req.body, req.file);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Category crated successfully!!!",
+    data: result,
+  });
+});
+
 // ! for getting all category
 const getAllCategory = catchAsync(async (req, res) => {
   const result = await categoryServices.getAllCategory();
@@ -23,18 +36,6 @@ const getSingleCategory = catchAsync(async (req, res) => {
     status: httpStatus.OK,
     success: true,
     message: "Category retrived successfully!!!",
-    data: result,
-  });
-});
-
-// ! for crating category
-const createCategory = catchAsync(async (req, res) => {
-  const result = await categoryServices.addCategory(req.body);
-
-  sendResponse(res, {
-    status: httpStatus.OK,
-    success: true,
-    message: "Category crated successfully!!!",
     data: result,
   });
 });

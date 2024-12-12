@@ -1,4 +1,6 @@
+import { IFile } from "../../interface/file";
 import prisma from "../../util/prisma";
+import { SendImageCloudinary } from "../../util/SendImageCloudinary";
 
 type ICategory = {
   name: string;
@@ -24,9 +26,29 @@ const getSingleCategory = async (categoryId: string) => {
 };
 
 // ! for creating category
-const addCategory = async (payload: ICategory) => {
+const addCategory = async (
+  payload: ICategory,
+  file: Partial<IFile> | undefined
+) => {
+  console.log(file);
+  let categoryImg;
+
+  if (file) {
+    const name = payload?.name.trim();
+    const path = file?.path;
+
+    const cloudinaryResponse = await SendImageCloudinary(
+      path as string,
+      name as string
+    );
+    categoryImg = cloudinaryResponse?.secure_url;
+  }
+
   const result = await prisma.categories.create({
-    data: payload,
+    data: {
+      name: payload?.name,
+      categoryImg,
+    },
   });
 
   return result;

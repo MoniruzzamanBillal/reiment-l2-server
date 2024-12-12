@@ -47,15 +47,60 @@ const createUser = async (
   return result;
 };
 
+// ! for updating a user
+const updateUser = async (
+  payload: { name: string; email: string; profileImg?: string },
+  file: Partial<IFile> | undefined,
+  userId: string
+) => {
+  const userData = await prisma.user.findUnique({
+    where: {
+      id: userId,
+      isDelated: false,
+    },
+  });
+
+  if (!userData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User dont exist !!");
+  }
+
+  if (file) {
+    const name = userData?.username.trim();
+    const path = (file?.path as string).trim();
+
+    const cloudinaryResponse = await SendImageCloudinary(
+      path as string,
+      name as string
+    );
+    const profileImg = cloudinaryResponse?.secure_url;
+    payload.profileImg = profileImg;
+  }
+  console.log(payload);
+  const result = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: payload,
+  });
+
+  console.log(result);
+
+  return result;
+};
+
 // ! login
 const login = async (payload: TLogin) => {
-  const user = await prisma.user.findUniqueOrThrow({
+  const user = await prisma.user.findUnique({
     where: {
       email: payload.email,
       status: UserStatus.ACTIVE,
       isDelated: false,
     },
   });
+
+  if (!user) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User dont exist !!");
+  }
 
   const { password: userPassword, ...userData } = user;
 
@@ -83,4 +128,5 @@ const login = async (payload: TLogin) => {
 export const authServices = {
   createUser,
   login,
+  updateUser,
 };

@@ -3,6 +3,8 @@ import { authController } from "./auth.controller";
 import { upload } from "../../util/SendImageCloudinary";
 import validateRequest from "../../middleware/validateRequest";
 import { userValidations } from "../user/user.validation";
+import validateUser from "../../middleware/validateUser";
+import { UserRole } from "@prisma/client";
 
 const router = Router();
 
@@ -23,6 +25,18 @@ router.post(
   },
   validateRequest(userValidations.createUserValidationSchema),
   authController.crateUser
+);
+
+// ! for updating a user
+router.patch(
+  "/update-user",
+  upload.single("profileImg"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
+  validateUser(UserRole.ADMIN, UserRole.CUSTOMER, UserRole.VENDOR),
+  authController.updateUser
 );
 
 //

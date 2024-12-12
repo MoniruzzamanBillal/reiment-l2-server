@@ -2,6 +2,7 @@ import { UserRole } from "@prisma/client";
 import prisma from "../../util/prisma";
 import AppError from "../../Error/AppError";
 import httpStatus from "http-status";
+import { TUser } from "./user.interface";
 
 const getAllUsers = async () => {
   const result = await prisma.user.findMany({
@@ -37,5 +38,22 @@ const getLoggedInUser = async (userId: string) => {
   return result;
 };
 
+// ! for updating user profile
+const handleUpdaeProfile = async (payload: Partial<TUser>, userId: string) => {
+  const result = await prisma.user.update({
+    where: {
+      id: userId,
+      isDelated: false,
+    },
+    data: payload,
+  });
+
+  return result;
+};
+
 //
-export const userServices = { getAllUsers, getLoggedInUser };
+export const userServices = {
+  getAllUsers,
+  getLoggedInUser,
+  handleUpdaeProfile,
+};

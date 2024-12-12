@@ -35,6 +35,8 @@ router.patch(
   "/update-product/:id",
   upload.single("prodImg"),
   (req: Request, res: Response, next: NextFunction) => {
+    console.log("File:", req.file);
+    console.log("Body:", req.body);
     req.body = JSON.parse(req.body.data);
     next();
   },
