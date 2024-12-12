@@ -24,6 +24,13 @@ router.post(
   productController.addProduct
 );
 
+// ! for duplicating a product
+router.post(
+  "/duplicate-product",
+  validateUser(UserRole.VENDOR),
+  productController.duplicateProduct
+);
+
 // ! for getting vendor shop's product
 router.get("/get-vendor-product/:id", productController.getVendorShopProducts);
 
@@ -35,8 +42,6 @@ router.patch(
   "/update-product/:id",
   upload.single("prodImg"),
   (req: Request, res: Response, next: NextFunction) => {
-    console.log("File:", req.file);
-    console.log("Body:", req.body);
     req.body = JSON.parse(req.body.data);
     next();
   },

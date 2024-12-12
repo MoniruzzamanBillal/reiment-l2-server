@@ -6,4 +6,5 @@ export type TShop = {
   description: string;
   inventoryCount: number;
   discount?: number;
+  productImg?: string;
 };

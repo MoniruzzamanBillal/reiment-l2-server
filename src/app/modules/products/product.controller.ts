@@ -78,6 +78,18 @@ const getSingleProduct = catchAsync(async (req, res) => {
   });
 });
 
+// ! for duplicating product
+const duplicateProduct = catchAsync(async (req, res) => {
+  const result = await productServices.handleDuplicateProduct(req.body);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Product Duplicated successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const productController = {
   addProduct,
@@ -86,4 +98,5 @@ export const productController = {
   getVendorShopProducts,
   getSingleProduct,
   getAllProducts,
+  duplicateProduct,
 };

@@ -9,13 +9,21 @@ import { JwtPayload } from "jsonwebtoken";
 
 // ! for crating a product
 const addProduct = async (payload: TShop, file: Partial<IFile> | undefined) => {
-  await prisma.shop.findUniqueOrThrow({
+  const shopData = await prisma.shop.findUnique({
     where: { id: payload?.shopId, isDelated: false },
   });
 
-  await prisma.categories.findUniqueOrThrow({
+  if (!shopData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Shop don't exist!!!");
+  }
+
+  const categoryData = await prisma.categories.findUnique({
     where: { id: payload?.categoryId },
   });
+
+  if (!categoryData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Categoty don't exist!!!");
+  }
 
   let productImg;
 
@@ -120,13 +128,13 @@ const deleteProduct = async (prodId: string, vendorUser: JwtPayload) => {
     });
 
     // ! delete cart item
-    trxnCllient.cartItem.deleteMany({
+    await trxnCllient.cartItem.deleteMany({
       where: {
         productId: prodId,
       },
     });
 
-    trxnCllient.review.updateMany({
+    await trxnCllient.review.updateMany({
       where: {
         productId: prodId,
       },
@@ -189,6 +197,31 @@ const getSingleProduct = async (prodId: string) => {
   return result;
 };
 
+// ! for duplicating a product
+const handleDuplicateProduct = async (payload: TShop) => {
+  const shopData = await prisma.shop.findUnique({
+    where: { id: payload?.shopId, isDelated: false },
+  });
+
+  if (!shopData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Shop don't exist!!!");
+  }
+
+  const categoryData = await prisma.categories.findUnique({
+    where: { id: payload?.categoryId },
+  });
+
+  if (!categoryData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Categoty don't exist!!!");
+  }
+
+  const result = await prisma.products.create({
+    data: payload,
+  });
+
+  return result;
+};
+
 //
 export const productServices = {
   addProduct,
@@ -197,4 +230,5 @@ export const productServices = {
   getVendorProduct,
   getSingleProduct,
   getAllProducts,
+  handleDuplicateProduct,
 };
