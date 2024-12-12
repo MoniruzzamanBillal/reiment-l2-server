@@ -109,6 +109,8 @@ model CartItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  isDelated Boolean @default(false)
+
   @@unique([cartId, productId])
   @@map("cartItem")
 }
@@ -142,6 +144,8 @@ model OrderItem {
   isDelated  Boolean @default(false)
   isReviewed Boolean @default(false)
 
+  isDeleted Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   review    Review?
@@ -160,6 +164,7 @@ model Review {
   rating      Int
   comment     String
 
+  isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

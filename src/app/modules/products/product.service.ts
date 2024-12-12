@@ -46,13 +46,17 @@ const updateProduct = async (
   file: Partial<IFile> | undefined,
   prodId: string
 ) => {
-  await prisma.products.findUniqueOrThrow({
+  const prodData = await prisma.products.findUnique({
     where: {
       id: prodId,
       isDelated: false,
       shopId: payload?.shopId,
     },
   });
+
+  if (!prodData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Product not found !!!");
+  }
 
   let updatedData;
   if (file) {
@@ -87,10 +91,14 @@ const updateProduct = async (
 
 // ! for deleting porduct
 const deleteProduct = async (prodId: string, vendorUser: JwtPayload) => {
-  const prodData = await prisma.products.findUniqueOrThrow({
+  const prodData = await prisma.products.findUnique({
     where: { id: prodId, isDelated: false },
     include: { shop: true },
   });
+
+  if (!prodData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Product not found !!!");
+  }
 
   if (vendorUser?.userId !== prodData?.shop?.vendorId) {
     throw new AppError(
@@ -99,12 +107,33 @@ const deleteProduct = async (prodId: string, vendorUser: JwtPayload) => {
     );
   }
 
-  await prisma.products.update({
-    where: {
-      id: prodId,
-      shopId: prodData?.shopId,
-    },
-    data: { isDelated: true },
+  await prisma.$transaction(async (trxnCllient) => {
+    // ! delete product
+    await trxnCllient.products.update({
+      where: {
+        id: prodId,
+        shopId: prodData.shopId,
+      },
+      data: {
+        isDelated: true,
+      },
+    });
+
+    // ! delete cart item
+    trxnCllient.cartItem.deleteMany({
+      where: {
+        productId: prodId,
+      },
+    });
+
+    trxnCllient.review.updateMany({
+      where: {
+        productId: prodId,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
   });
 };
 
