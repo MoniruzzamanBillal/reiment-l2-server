@@ -176,6 +176,24 @@ const getAllProducts = async () => {
   return result;
 };
 
+// ! for getting flash sale products
+const getFlashSellProducts = async () => {
+  const result = await prisma.products.findMany({
+    where: {
+      isDelated: false,
+      discount: {
+        gte: 80,
+      },
+    },
+    include: {
+      shop: true,
+      category: true,
+    },
+  });
+
+  return result;
+};
+
 // ! for getting single product
 const getSingleProduct = async (prodId: string) => {
   const result = await prisma.products.findUnique({
@@ -231,4 +249,5 @@ export const productServices = {
   getSingleProduct,
   getAllProducts,
   handleDuplicateProduct,
+  getFlashSellProducts,
 };

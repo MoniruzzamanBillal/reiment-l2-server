@@ -11,6 +11,9 @@ const router = Router();
 // ! for getting all product
 router.get("/all-products", productController.getAllProducts);
 
+// ! for getting flash sale  products
+router.get("/flashsale-products", productController.getFlashSaleProduct);
+
 // ! for adding product
 router.post(
   "/add-product",
