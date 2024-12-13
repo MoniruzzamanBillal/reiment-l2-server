@@ -168,7 +168,7 @@ const getVendorProduct = async (shopId: string) => {
 // ! for getting all product data
 const getAllProducts = async (options: IPaginationOptions, filter: any) => {
   const { page, limit, skip } = calculatePagination(options);
-  // console.log(filter);
+  console.log(filter);
   // console.log("page = ", page);
   // console.log("limit = ", limit);
   // console.log("skip = ", skip);
@@ -182,21 +182,25 @@ const getAllProducts = async (options: IPaginationOptions, filter: any) => {
     },
   }));
 
-  console.log(searchConditions);
-
   andConditions.push({
     OR: searchConditions,
   });
 
-  console.log(andConditions);
+  if (filter?.categoryId) {
+    andConditions.push({
+      categoryId: {
+        contains: filter?.categoryId,
+      },
+    });
+  }
 
   const result = await prisma.products.findMany({
     where: {
       AND: andConditions,
       isDelated: false,
     },
-    take: limit,
-    skip,
+    // take: limit,
+    // skip,
     include: {
       shop: true,
       category: true,
