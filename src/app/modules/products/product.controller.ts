@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../util/catchAsync";
 import sendResponse from "../../util/sendResponse";
 import { productServices } from "./product.service";
+import pick from "../../util/pick";
 
 // ! for crating a shop
 const addProduct = catchAsync(async (req, res) => {
@@ -56,7 +57,12 @@ const getVendorShopProducts = catchAsync(async (req, res) => {
 
 // ! for getting all products data
 const getAllProducts = catchAsync(async (req, res) => {
-  const result = await productServices.getAllProducts();
+  console.log(req.query);
+
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  const filter = pick(req.query, ["searchTerm", "categoryId"]);
+
+  const result = await productServices.getAllProducts(options, filter);
 
   sendResponse(res, {
     status: httpStatus.OK,

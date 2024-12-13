@@ -6,6 +6,10 @@ import prisma from "../../util/prisma";
 import { SendImageCloudinary } from "../../util/SendImageCloudinary";
 import { TShop } from "./product.interface";
 import { JwtPayload } from "jsonwebtoken";
+import calculatePagination, {
+  IPaginationOptions,
+} from "../../util/paginationHelper";
+import { productSearchableFields } from "./product.constants";
 
 // ! for crating a product
 const addProduct = async (payload: TShop, file: Partial<IFile> | undefined) => {
@@ -162,11 +166,37 @@ const getVendorProduct = async (shopId: string) => {
 };
 
 // ! for getting all product data
-const getAllProducts = async () => {
+const getAllProducts = async (options: IPaginationOptions, filter: any) => {
+  const { page, limit, skip } = calculatePagination(options);
+  // console.log(filter);
+  // console.log("page = ", page);
+  // console.log("limit = ", limit);
+  // console.log("skip = ", skip);
+
+  const andConditions = [];
+
+  const searchConditions = productSearchableFields.map((field) => ({
+    [field]: {
+      contains: filter.searchTerm,
+      mode: "insensitive",
+    },
+  }));
+
+  console.log(searchConditions);
+
+  andConditions.push({
+    OR: searchConditions,
+  });
+
+  console.log(andConditions);
+
   const result = await prisma.products.findMany({
     where: {
+      AND: andConditions,
       isDelated: false,
     },
+    take: limit,
+    skip,
     include: {
       shop: true,
       category: true,
@@ -174,6 +204,8 @@ const getAllProducts = async () => {
   });
 
   return result;
+
+  //
 };
 
 // ! for getting flash sale products
