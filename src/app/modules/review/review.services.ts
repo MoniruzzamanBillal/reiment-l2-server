@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import AppError from "../../Error/AppError";
 import prisma from "../../util/prisma";
 import { TAddReview } from "./review.interface";
+import { OrderStatus } from "@prisma/client";
 
 // ! give review
 const createReview = async (payload: TAddReview, userId: string) => {
@@ -11,6 +12,7 @@ const createReview = async (payload: TAddReview, userId: string) => {
       isReviewed: false,
       order: {
         customerId: userId,
+        status: OrderStatus.COMPLETED,
       },
     },
   });
@@ -60,7 +62,26 @@ const createReview = async (payload: TAddReview, userId: string) => {
   //
 };
 
+// ! check eligibility for giving review
+const checkEligibleFroReview = async (prodId: string, userId: string) => {
+  const result = await prisma.orderItem.findFirst({
+    where: {
+      productId: prodId,
+      isReviewed: false,
+      order: {
+        customerId: userId,
+        status: OrderStatus.COMPLETED,
+      },
+    },
+  });
+
+  console.log("check eligible product = ", result);
+
+  return result;
+};
+
 //
 export const reviewServices = {
   createReview,
+  checkEligibleFroReview,
 };

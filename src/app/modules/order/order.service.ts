@@ -99,6 +99,7 @@ const getOrder = async (userId: string) => {
   const result = await prisma.order.findMany({
     where: {
       customerId: userId,
+      isDelated: false,
     },
   });
 

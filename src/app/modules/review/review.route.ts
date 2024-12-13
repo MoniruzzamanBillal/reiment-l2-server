@@ -5,6 +5,13 @@ import { reviewController } from "./review.controller";
 
 const router = Router();
 
+// ! for checking eligibility for review
+router.get(
+  "/check-eligible-for-review/:id",
+  validateUser(UserRole.CUSTOMER),
+  reviewController.checkEligibleForReview
+);
+
 // ! add review
 router.post(
   "/give-review",

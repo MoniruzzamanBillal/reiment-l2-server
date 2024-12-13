@@ -41,6 +41,10 @@ const addToCart = async (payload: TCart, userId: string) => {
     );
   }
 
+  const itemPrice = productData.discount
+    ? productData?.price - productData?.discount
+    : productData?.price;
+
   // Add item to cart
   await prisma.cartItem.upsert({
     where: {
@@ -51,7 +55,8 @@ const addToCart = async (payload: TCart, userId: string) => {
       cartId: cartData.id,
       productId: payload.productId,
       quantity: payload.quantity,
-      price: productData.price,
+      // price: productData.price,
+      price: itemPrice,
     },
   });
 

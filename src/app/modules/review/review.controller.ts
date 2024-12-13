@@ -15,7 +15,23 @@ const addReview = catchAsync(async (req, res) => {
   });
 });
 
+// ! for checking eligibility for order
+const checkEligibleForReview = catchAsync(async (req, res) => {
+  const result = await reviewServices.checkEligibleFroReview(
+    req.params?.id,
+    req.user?.userId
+  );
+
+  sendResponse(res, {
+    status: httpStatus.CREATED,
+    success: true,
+    message: "Eligible for review!!!",
+    data: result,
+  });
+});
+
 //
 export const reviewController = {
   addReview,
+  checkEligibleForReview,
 };

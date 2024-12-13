@@ -168,6 +168,8 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  //  @@unique([cartId, productId])
+
   @@map("reviews")
 }
 
