@@ -12,6 +12,7 @@ import { paymentRouter } from "../modules/payment/payment.route";
 import { addressRouter } from "../modules/address/address.route";
 import { reviewRouter } from "../modules/review/review.route";
 import { followerRouter } from "../modules/follower/follower.route";
+import { couponRouter } from "../modules/coupon/coupon.route";
 
 const router = Router();
 
@@ -67,6 +68,10 @@ const routeArray = [
   {
     path: "/follow",
     route: followerRouter,
+  },
+  {
+    path: "/coupon",
+    route: couponRouter,
   },
 ];
 
