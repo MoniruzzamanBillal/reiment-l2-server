@@ -5,9 +5,12 @@ import { TCoupon } from "./coupon.interface";
 
 // ! for adding coupon
 const addCoupon = async (payload: TCoupon) => {
-  const checkExist = await prisma.coupon.findUnique({
+  const checkExist = await prisma.coupon.findFirst({
     where: {
-      code: payload?.code,
+      code: {
+        contains: payload?.code,
+        mode: "insensitive",
+      },
     },
   });
 
@@ -22,7 +25,25 @@ const addCoupon = async (payload: TCoupon) => {
   return result;
 };
 
+const getSingleCoupon = async (couponCode: string) => {
+  const checkCoupon = await prisma.coupon.findFirst({
+    where: {
+      code: {
+        contains: couponCode,
+        mode: "insensitive",
+      },
+    },
+  });
+
+  if (!checkCoupon) {
+    throw new AppError(httpStatus.BAD_REQUEST, "This coupon don't exist!!!");
+  }
+
+  return checkCoupon;
+};
+
 //
 export const couponServices = {
   addCoupon,
+  getSingleCoupon,
 };

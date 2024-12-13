@@ -15,7 +15,20 @@ const addCoupon = catchAsync(async (req, res) => {
   });
 });
 
+// ! for getting single coupon
+const getSingleCoupon = catchAsync(async (req, res) => {
+  const result = await couponServices.getSingleCoupon(req.body?.couponCode);
+
+  sendResponse(res, {
+    status: httpStatus.CREATED,
+    success: true,
+    message: "Coupon retrived successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const couponController = {
   addCoupon,
+  getSingleCoupon,
 };
