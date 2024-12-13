@@ -78,6 +78,19 @@ const getFlashSaleProduct = catchAsync(async (req, res) => {
   });
 });
 
+// ! get recent products
+const getRecentProducts = catchAsync(async (req, res) => {
+  console.log(req.body);
+  const result = await productServices.getRecentProducts(req.body);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Recent Products retrived successfully!!!",
+    data: result,
+  });
+});
+
 // ! for category related products
 const getRelatedProducts = catchAsync(async (req, res) => {
   const result = await productServices.getRelatedProducts(req.params?.id);
@@ -125,4 +138,5 @@ export const productController = {
   duplicateProduct,
   getFlashSaleProduct,
   getRelatedProducts,
+  getRecentProducts,
 };

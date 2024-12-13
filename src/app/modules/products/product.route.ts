@@ -34,6 +34,9 @@ router.post(
   productController.duplicateProduct
 );
 
+// ! for getting recent products
+router.patch("/recent-products", productController.getRecentProducts);
+
 // ! for getting vendor shop's product
 router.get("/get-vendor-product/:id", productController.getVendorShopProducts);
 

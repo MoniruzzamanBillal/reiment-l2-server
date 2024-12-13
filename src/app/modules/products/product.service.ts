@@ -249,6 +249,19 @@ const getRelatedProducts = async (categoryId: string) => {
   return result;
 };
 
+// ! for getting recent products
+const getRecentProducts = async (payload: string[]) => {
+  const result = await prisma.products.findMany({
+    where: {
+      id: {
+        in: payload,
+      },
+    },
+  });
+
+  return result;
+};
+
 //
 export const productServices = {
   addProduct,
@@ -260,4 +273,5 @@ export const productServices = {
   handleDuplicateProduct,
   getFlashSellProducts,
   getRelatedProducts,
+  getRecentProducts,
 };
