@@ -166,8 +166,11 @@ const getVendorProduct = async (shopId: string) => {
 };
 
 // ! for getting all product data
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getAllProducts = async (options: IPaginationOptions, filter: any) => {
   const { page, limit, skip } = calculatePagination(options);
+
+  // console.log("user id = ", userId);
   console.log(filter);
   // console.log("page = ", page);
   // console.log("limit = ", limit);
@@ -202,20 +205,46 @@ const getAllProducts = async (options: IPaginationOptions, filter: any) => {
     });
   }
 
-  const result = await prisma.products.findMany({
+  const allProducts = await prisma.products.findMany({
     where: {
       AND: andConditions,
       isDelated: false,
     },
-    // take: limit,
-    // skip,
+    orderBy: { createdAt: "desc" },
     include: {
       shop: true,
       category: true,
     },
   });
 
-  return result;
+  if (filter?.userId) {
+    const userData = await prisma.user.findUnique({
+      where: { id: filter?.userId },
+      include: {
+        follower: true,
+      },
+    });
+
+    const followShopId = userData?.follower?.map((follow) => follow?.shopId);
+
+    const followedProducts = allProducts?.filter((product) =>
+      followShopId?.includes(product.shopId)
+    );
+
+    const remainingProducts = allProducts?.filter(
+      (product) => !followShopId?.includes(product.shopId)
+    );
+
+    const sortedProducts = [...followedProducts, ...remainingProducts];
+
+    const paginatedProducts = sortedProducts.slice(skip, skip + limit);
+
+    return paginatedProducts;
+  } else {
+    const paginatedProducts = allProducts.slice(skip, skip + limit);
+
+    return paginatedProducts;
+  }
 
   //
 };

@@ -60,7 +60,12 @@ const getAllProducts = catchAsync(async (req, res) => {
   console.log(req.query);
 
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-  const filter = pick(req.query, ["searchTerm", "categoryId", "priceRange"]);
+  const filter = pick(req.query, [
+    "searchTerm",
+    "categoryId",
+    "priceRange",
+    "userId",
+  ]);
 
   const result = await productServices.getAllProducts(options, filter);
 
