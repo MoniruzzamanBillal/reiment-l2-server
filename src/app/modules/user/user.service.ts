@@ -28,6 +28,8 @@ const getLoggedInUser = async (userId: string) => {
       profileImg: true,
       role: true,
       status: true,
+      follower: true,
+      review: true,
     },
   });
 

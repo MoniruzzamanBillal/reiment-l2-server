@@ -101,6 +101,9 @@ const getOrder = async (userId: string) => {
       customerId: userId,
       isDelated: false,
     },
+    include: {
+      orderItem: true,
+    },
   });
 
   return result;

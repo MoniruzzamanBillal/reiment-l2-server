@@ -200,6 +200,7 @@ model Follower {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([customerId, shopId])
   @@map("follower")
 }
 
