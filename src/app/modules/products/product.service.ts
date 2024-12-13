@@ -194,6 +194,14 @@ const getAllProducts = async (options: IPaginationOptions, filter: any) => {
     });
   }
 
+  if (filter?.priceRange) {
+    andConditions.push({
+      price: {
+        lte: Number(filter?.priceRange),
+      },
+    });
+  }
+
   const result = await prisma.products.findMany({
     where: {
       AND: andConditions,
