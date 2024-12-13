@@ -4,9 +4,24 @@ import prisma from "../../util/prisma";
 import { initiatePayment } from "../payment/payment.util";
 
 // ! for ordering product
-const orderItem = async (payload: { cartId: string }, userId: string) => {
-  const { cartId } = payload;
+const orderItem = async (
+  payload: { cartId: string; cuponId?: string },
+  userId: string
+) => {
+  const { cartId, cuponId } = payload;
+
   const trxnNumber = `TXN-${Date.now()}`;
+
+  let discountValue = 0;
+
+  if (cuponId) {
+    const couponData = await prisma.coupon.findUnique({
+      where: {
+        id: cuponId,
+      },
+    });
+    discountValue = couponData?.discountValue as number;
+  }
 
   // get cart items
   const cartItems = await prisma.cartItem.findMany({
@@ -17,10 +32,12 @@ const orderItem = async (payload: { cartId: string }, userId: string) => {
     throw new AppError(httpStatus.BAD_REQUEST, "Cart is empty");
   }
 
-  const totalPrice = cartItems.reduce(
+  let totalPrice = cartItems.reduce(
     (sum, item) => sum + item.quantity * item.price,
     0
   );
+
+  totalPrice -= discountValue;
 
   const result = prisma.$transaction(async (trxnClient) => {
     // create order data
