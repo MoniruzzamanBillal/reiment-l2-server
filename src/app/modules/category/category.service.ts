@@ -57,19 +57,49 @@ const addCategory = async (
 };
 
 // ! for updating category
-const updateCategory = async (payload: ICategory, categoryId: string) => {
-  await prisma.categories.findUniqueOrThrow({
+const updateCategory = async (
+  payload: Partial<ICategory>,
+  file: Partial<IFile> | undefined,
+  categoryId: string
+) => {
+  const categoryData = await prisma.categories.findUnique({
     where: {
       id: categoryId,
       isDelated: false,
     },
   });
 
+  if (!categoryData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Category not found !!!");
+  }
+
+  let updatedData;
+
+  if (file) {
+    const name = payload?.name?.trim() as string;
+    const path = file?.path?.trim() as string;
+
+    const cloudinaryResponse = await SendImageCloudinary(
+      path as string,
+      name as string
+    );
+    const categoryImg = cloudinaryResponse?.secure_url;
+
+    updatedData = {
+      ...payload,
+      categoryImg,
+    };
+  } else {
+    updatedData = {
+      ...payload,
+    };
+  }
+
   const result = await prisma.categories.update({
     where: {
       id: categoryId,
     },
-    data: payload,
+    data: updatedData,
   });
 
   return result;

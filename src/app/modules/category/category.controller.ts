@@ -41,7 +41,11 @@ const getSingleCategory = catchAsync(async (req, res) => {
 
 // ! for updating category
 const updateCategory = catchAsync(async (req, res) => {
-  const result = await categoryServices.updateCategory(req.body, req.params.id);
+  const result = await categoryServices.updateCategory(
+    req.body,
+    req.file,
+    req.params.id
+  );
 
   sendResponse(res, {
     status: httpStatus.OK,

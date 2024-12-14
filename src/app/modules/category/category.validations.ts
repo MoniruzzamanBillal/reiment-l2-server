@@ -10,7 +10,7 @@ const createCategotyValidationSchema = z.object({
 // ! for updating category
 const updateCategotyValidationSchema = z.object({
   body: z.object({
-    name: z.string().min(1, "Category Name is required"),
+    name: z.string().min(1, "Category Name is required").optional(),
   }),
 });
 

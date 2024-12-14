@@ -30,6 +30,11 @@ router.get("/category/:id", categoryController.getSingleCategory);
 // ! for updating category
 router.patch(
   "/update-category/:id",
+  upload.single("categoryImg"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
   validateUser(UserRole.ADMIN),
   validateRequest(categoryValidations.updateCategotyValidationSchema),
   categoryController.updateCategory
