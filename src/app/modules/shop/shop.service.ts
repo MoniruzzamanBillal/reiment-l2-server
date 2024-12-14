@@ -99,10 +99,6 @@ const updateShop = async (
 // ! for getting all shop data
 const getAllShopData = async () => {
   const result = await prisma.shop.findMany({
-    where: {
-      status: ShopStatus.ACTIVE,
-      isDelated: false,
-    },
     include: {
       vendor: {
         select: {
@@ -112,6 +108,7 @@ const getAllShopData = async () => {
         },
       },
     },
+    orderBy: { updatedAt: "desc" },
   });
 
   return result;
