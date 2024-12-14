@@ -42,9 +42,35 @@ const getVendorProductReviews = catchAsync(async (req, res) => {
   });
 });
 
+// ! for getting all reviews
+const getAllReview = catchAsync(async (req, res) => {
+  const result = await reviewServices.getAllReview();
+
+  sendResponse(res, {
+    status: httpStatus.CREATED,
+    success: true,
+    message: "Review retrived successfully !!! ",
+    data: result,
+  });
+});
+
+// ! for updating review
+const updateReview = catchAsync(async (req, res) => {
+  const result = await reviewServices.updateReview(req.body);
+
+  sendResponse(res, {
+    status: httpStatus.CREATED,
+    success: true,
+    message: "Review updated successfully !!! ",
+    data: result,
+  });
+});
+
 //
 export const reviewController = {
   addReview,
   checkEligibleForReview,
   getVendorProductReviews,
+  getAllReview,
+  updateReview,
 };

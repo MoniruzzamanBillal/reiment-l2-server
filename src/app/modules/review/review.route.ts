@@ -5,6 +5,9 @@ import { reviewController } from "./review.controller";
 
 const router = Router();
 
+// ! for getting all review
+router.get("/all-review", reviewController.getAllReview);
+
 // ! for checking eligibility for review
 router.get(
   "/check-eligible-for-review/:id",
@@ -25,6 +28,9 @@ router.post(
   validateUser(UserRole.CUSTOMER),
   reviewController.addReview
 );
+
+// ! updating review
+router.patch("/update-review", reviewController.updateReview);
 
 //
 export const reviewRouter = router;

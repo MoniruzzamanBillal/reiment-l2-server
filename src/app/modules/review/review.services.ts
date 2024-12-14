@@ -111,9 +111,49 @@ const getVendorProductReviews = async (vendorUserId: string) => {
   //
 };
 
+// ! get all review
+const getAllReview = async () => {
+  const result = await prisma.review.findMany({
+    where: { isDeleted: false },
+    include: {
+      product: true,
+      user: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return result;
+};
+
+// ! update review
+const updateReview = async (payload: { reviewId: string; comment: string }) => {
+  const { reviewId, comment } = payload;
+
+  console.log(payload);
+
+  const reviewData = await prisma.review.findUnique({
+    where: {
+      id: reviewId,
+    },
+  });
+
+  if (!reviewData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Review dont exist !!!");
+  }
+
+  const result = await prisma.review.update({
+    where: { id: reviewId },
+    data: { comment },
+  });
+
+  return result;
+};
+
 //
 export const reviewServices = {
   createReview,
   checkEligibleFroReview,
   getVendorProductReviews,
+  getAllReview,
+  updateReview,
 };
