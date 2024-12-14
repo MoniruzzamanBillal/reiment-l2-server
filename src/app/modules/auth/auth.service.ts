@@ -205,7 +205,7 @@ const blockVendorShop = async (payload: { vendorShopId: string }) => {
   // delete product for vendor shop
   // delete cart item for that vendror shop
   await prisma.$transaction(async (trxnClient) => {
-    // ! block vendor shop
+    // * block vendor shop
     await trxnClient.shop.update({
       where: {
         id: vendorShopId,
@@ -216,7 +216,7 @@ const blockVendorShop = async (payload: { vendorShopId: string }) => {
       },
     });
 
-    // ! delete vendor shop product
+    // * delete vendor shop product
     await trxnClient.products.updateMany({
       where: {
         shopId: vendorShopId,
@@ -226,7 +226,7 @@ const blockVendorShop = async (payload: { vendorShopId: string }) => {
       },
     });
 
-    // ! delete cart items
+    // * delete cart items
     await trxnClient.cartItem.deleteMany({
       where: {
         product: {
@@ -241,6 +241,49 @@ const blockVendorShop = async (payload: { vendorShopId: string }) => {
   //
 };
 
+const unblockVendor = async (payload: { vendorShopId: string }) => {
+  const { vendorShopId } = payload;
+
+  const shopData = await prisma.shop.findUnique({
+    where: {
+      id: vendorShopId,
+      isDelated: true,
+      status: ShopStatus.BLOCKED,
+    },
+  });
+
+  if (!shopData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Shop data don't exist !!!");
+  }
+
+  // unblock vendor shop
+  // make isDelete false for vendor shop products
+  await prisma.$transaction(async (trxnClient) => {
+    // * unblock vendor shop
+    await trxnClient.shop.update({
+      where: {
+        id: vendorShopId,
+      },
+      data: {
+        isDelated: false,
+        status: ShopStatus.ACTIVE,
+      },
+    });
+
+    // * reverse delete vendor shop product
+    await trxnClient.products.updateMany({
+      where: {
+        shopId: vendorShopId,
+      },
+      data: {
+        isDelated: false,
+      },
+    });
+  });
+
+  //
+};
+
 //
 export const authServices = {
   createUser,
@@ -249,4 +292,5 @@ export const authServices = {
   deleteUser,
   unblockUser,
   blockVendorShop,
+  unblockVendor,
 };
