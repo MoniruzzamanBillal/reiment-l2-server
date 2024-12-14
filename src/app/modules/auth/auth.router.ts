@@ -53,5 +53,12 @@ router.patch(
   authController.unblockUser
 );
 
+// ! for blocking vendor shop
+router.patch(
+  "/block-vendor-shop",
+  validateUser(UserRole.ADMIN),
+  authController.blockVendor
+);
+
 //
 export const authRouter = router;

@@ -78,6 +78,18 @@ const unblockUser = catchAsync(async (req, res) => {
   });
 });
 
+// ! for blocking vendor shop
+const blockVendor = catchAsync(async (req, res) => {
+  const result = await authServices.blockVendorShop(req.body);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Vendor shop blocked successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const authController = {
   crateUser,
@@ -85,4 +97,5 @@ export const authController = {
   updateUser,
   deleteUser,
   unblockUser,
+  blockVendor,
 };

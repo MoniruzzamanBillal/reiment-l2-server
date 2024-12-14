@@ -3,7 +3,7 @@ import { IFile } from "../../interface/file";
 import prisma from "../../util/prisma";
 import { SendImageCloudinary } from "../../util/SendImageCloudinary";
 import { TLogin, TUser } from "../user/user.interface";
-import { UserStatus } from "@prisma/client";
+import { ShopStatus, UserStatus } from "@prisma/client";
 import AppError from "../../Error/AppError";
 import httpStatus from "http-status";
 import { createToken } from "./auth.util";
@@ -186,6 +186,61 @@ const unblockUser = async (payload: { userId: string }) => {
   return result;
 };
 
+// ! block vendor shop
+const blockVendorShop = async (payload: { vendorShopId: string }) => {
+  const { vendorShopId } = payload;
+
+  const shopData = await prisma.shop.findUnique({
+    where: {
+      id: vendorShopId,
+      isDelated: false,
+    },
+  });
+
+  if (!shopData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Shop data don't exist !!!");
+  }
+
+  // block vendor shop
+  // delete product for vendor shop
+  // delete cart item for that vendror shop
+  await prisma.$transaction(async (trxnClient) => {
+    // ! block vendor shop
+    await trxnClient.shop.update({
+      where: {
+        id: vendorShopId,
+      },
+      data: {
+        isDelated: true,
+        status: ShopStatus.BLOCKED,
+      },
+    });
+
+    // ! delete vendor shop product
+    await trxnClient.products.updateMany({
+      where: {
+        shopId: vendorShopId,
+      },
+      data: {
+        isDelated: true,
+      },
+    });
+
+    // ! delete cart items
+    await trxnClient.cartItem.deleteMany({
+      where: {
+        product: {
+          shopId: vendorShopId,
+        },
+      },
+    });
+
+    //
+  });
+
+  //
+};
+
 //
 export const authServices = {
   createUser,
@@ -193,4 +248,5 @@ export const authServices = {
   updateUser,
   deleteUser,
   unblockUser,
+  blockVendorShop,
 };
