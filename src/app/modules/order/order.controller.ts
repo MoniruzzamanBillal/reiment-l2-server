@@ -27,8 +27,21 @@ const getUserOrder = catchAsync(async (req, res) => {
   });
 });
 
+// ! for getting vendor shops order item products
+const getVendorOrderHistory = catchAsync(async (req, res) => {
+  const result = await orderServices.getVendorOrderHistory(req.user?.userId);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Vendor shop Order retrived successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const orderController = {
   orderItem,
   getUserOrder,
+  getVendorOrderHistory,
 };

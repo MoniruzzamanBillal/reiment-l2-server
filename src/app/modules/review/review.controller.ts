@@ -30,8 +30,21 @@ const checkEligibleForReview = catchAsync(async (req, res) => {
   });
 });
 
+// ! get vendor shops product review
+const getVendorProductReviews = catchAsync(async (req, res) => {
+  const result = await reviewServices.getVendorProductReviews(req.user?.userId);
+
+  sendResponse(res, {
+    status: httpStatus.CREATED,
+    success: true,
+    message: "Vendor shops product review ",
+    data: result,
+  });
+});
+
 //
 export const reviewController = {
   addReview,
   checkEligibleForReview,
+  getVendorProductReviews,
 };

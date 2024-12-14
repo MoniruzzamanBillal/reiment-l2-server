@@ -126,8 +126,48 @@ const getOrder = async (userId: string) => {
   return result;
 };
 
+// ! for getting vendor shops order item products
+const getVendorOrderHistory = async (vendorUserId: string) => {
+  const shop = await prisma.shop.findUnique({
+    where: {
+      vendorId: vendorUserId,
+    },
+  });
+
+  if (!shop) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Shop not found for this vendor."
+    );
+  }
+
+  const orderItems = prisma.order.findMany({
+    where: {
+      orderItem: {
+        some: {
+          product: {
+            shopId: shop?.id,
+          },
+        },
+      },
+    },
+    include: {
+      orderItem: {
+        include: {
+          product: true,
+        },
+      },
+      customer: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return orderItems;
+};
+
 //
 export const orderServices = {
   orderItem,
   getOrder,
+  getVendorOrderHistory,
 };

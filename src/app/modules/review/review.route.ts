@@ -12,6 +12,13 @@ router.get(
   reviewController.checkEligibleForReview
 );
 
+// ! for getting vendor prosuct review
+router.get(
+  "/getVendorProductReviews",
+  validateUser(UserRole.VENDOR),
+  reviewController.getVendorProductReviews
+);
+
 // ! add review
 router.post(
   "/give-review",

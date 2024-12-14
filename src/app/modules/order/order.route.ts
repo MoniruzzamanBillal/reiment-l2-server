@@ -12,6 +12,13 @@ router.get(
   orderController.getUserOrder
 );
 
+// ! for getting vendor shop order
+router.get(
+  "/vendorShop-order-history",
+  validateUser(UserRole.VENDOR),
+  orderController.getVendorOrderHistory
+);
+
 // ! for ordering item
 router.post(
   "/order-item",

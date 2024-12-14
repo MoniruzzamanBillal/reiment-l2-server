@@ -80,8 +80,40 @@ const checkEligibleFroReview = async (prodId: string, userId: string) => {
   return result;
 };
 
+// ! get vendor shops product review
+const getVendorProductReviews = async (vendorUserId: string) => {
+  const shop = await prisma.shop.findUnique({
+    where: { vendorId: vendorUserId },
+  });
+
+  if (!shop) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Shop not found for this vendor."
+    );
+  }
+
+  const reviews = await prisma.review.findMany({
+    where: {
+      product: {
+        shopId: shop?.id,
+      },
+    },
+    include: {
+      product: true,
+      user: true,
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  return reviews;
+
+  //
+};
+
 //
 export const reviewServices = {
   createReview,
   checkEligibleFroReview,
+  getVendorProductReviews,
 };
