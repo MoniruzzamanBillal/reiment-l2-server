@@ -5,6 +5,9 @@ import { orderController } from "./order.controller";
 
 const router = Router();
 
+// ! for getting all transaction data
+router.get("/all-transaction", orderController.getAllOrderTransactionData);
+
 // ! for getting user order
 router.get(
   "/user-order-history",

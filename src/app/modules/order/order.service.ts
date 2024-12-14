@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import AppError from "../../Error/AppError";
 import prisma from "../../util/prisma";
 import { initiatePayment } from "../payment/payment.util";
+import { OrderStatus } from "@prisma/client";
 
 // ! for ordering product
 const orderItem = async (
@@ -165,9 +166,21 @@ const getVendorOrderHistory = async (vendorUserId: string) => {
   return orderItems;
 };
 
+// ! for getting all transaction data
+const getAllTransactionData = async () => {
+  const result = await prisma.order.findMany({
+    where: { isDelated: false, status: OrderStatus.COMPLETED },
+    include: { customer: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return result;
+};
+
 //
 export const orderServices = {
   orderItem,
   getOrder,
   getVendorOrderHistory,
+  getAllTransactionData,
 };

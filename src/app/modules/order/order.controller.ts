@@ -39,9 +39,22 @@ const getVendorOrderHistory = catchAsync(async (req, res) => {
   });
 });
 
+// ! get all order data
+const getAllOrderTransactionData = catchAsync(async (req, res) => {
+  const result = await orderServices.getAllTransactionData();
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Transaction data retrived successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const orderController = {
   orderItem,
   getUserOrder,
   getVendorOrderHistory,
+  getAllOrderTransactionData,
 };
