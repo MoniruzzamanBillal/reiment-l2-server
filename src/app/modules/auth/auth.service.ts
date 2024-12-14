@@ -161,10 +161,36 @@ const deleteUser = async (payload: { userId: string }) => {
   //
 };
 
+// ! for unblocking user
+const unblockUser = async (payload: { userId: string }) => {
+  const userExist = await prisma.user.findUnique({
+    where: {
+      id: payload?.userId,
+    },
+  });
+
+  if (!userExist) {
+    throw new AppError(httpStatus.BAD_REQUEST, "This user don't exist !!!");
+  }
+
+  const result = await prisma.user.update({
+    where: {
+      id: payload?.userId,
+    },
+    data: {
+      isDelated: false,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  return result;
+};
+
 //
 export const authServices = {
   createUser,
   login,
   updateUser,
   deleteUser,
+  unblockUser,
 };

@@ -46,5 +46,12 @@ router.patch(
   authController.deleteUser
 );
 
+// ! for unblocking a user
+router.patch(
+  "/unblock-user",
+  validateUser(UserRole.ADMIN),
+  authController.unblockUser
+);
+
 //
 export const authRouter = router;

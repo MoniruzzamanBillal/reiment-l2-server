@@ -66,10 +66,23 @@ const deleteUser = catchAsync(async (req, res) => {
   });
 });
 
+// ! for unblocking a user
+const unblockUser = catchAsync(async (req, res) => {
+  const result = await authServices.unblockUser(req.body);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "User unblocked successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const authController = {
   crateUser,
   signIn,
   updateUser,
   deleteUser,
+  unblockUser,
 };
