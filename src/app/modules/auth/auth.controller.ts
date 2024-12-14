@@ -54,9 +54,22 @@ const signIn = catchAsync(async (req, res) => {
   });
 });
 
+// ! for deleting a user
+const deleteUser = catchAsync(async (req, res) => {
+  const result = await authServices.deleteUser(req.body);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "User deleted successfully!!!",
+    data: result,
+  });
+});
+
 //
 export const authController = {
   crateUser,
   signIn,
   updateUser,
+  deleteUser,
 };

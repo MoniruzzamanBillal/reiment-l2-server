@@ -39,5 +39,12 @@ router.patch(
   authController.updateUser
 );
 
+// ! for deleting a user
+router.patch(
+  "/delete-user",
+  validateUser(UserRole.ADMIN),
+  authController.deleteUser
+);
+
 //
 export const authRouter = router;

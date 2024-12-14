@@ -7,10 +7,12 @@ import { TUser } from "./user.interface";
 const getAllUsers = async () => {
   const result = await prisma.user.findMany({
     where: {
-      isDelated: false,
       role: {
         in: [UserRole.CUSTOMER, UserRole.VENDOR],
       },
+    },
+    orderBy: {
+      updatedAt: "desc",
     },
   });
 

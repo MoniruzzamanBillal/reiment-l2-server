@@ -75,15 +75,13 @@ const updateUser = async (
     const profileImg = cloudinaryResponse?.secure_url;
     payload.profileImg = profileImg;
   }
-  console.log(payload);
+
   const result = await prisma.user.update({
     where: {
       id: userId,
     },
     data: payload,
   });
-
-  console.log(result);
 
   return result;
 };
@@ -93,13 +91,18 @@ const login = async (payload: TLogin) => {
   const user = await prisma.user.findUnique({
     where: {
       email: payload.email,
-      status: UserStatus.ACTIVE,
-      isDelated: false,
     },
   });
 
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, "User dont exist !!");
+  }
+
+  if (user?.isDelated) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "User is blocked by the admin !!!"
+    );
   }
 
   const { password: userPassword, ...userData } = user;
@@ -124,9 +127,44 @@ const login = async (payload: TLogin) => {
   };
 };
 
+// ! for deleting a user
+const deleteUser = async (payload: { userId: string }) => {
+  const userExist = await prisma.user.findUnique({
+    where: {
+      id: payload?.userId,
+    },
+  });
+
+  if (!userExist) {
+    throw new AppError(httpStatus.BAD_REQUEST, "This user don't exist !!!");
+  }
+
+  if (userExist?.isDelated) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "This user is already deleted !!!"
+    );
+  }
+
+  const result = await prisma.user.update({
+    where: {
+      id: payload?.userId,
+    },
+    data: {
+      isDelated: true,
+      status: UserStatus.BLOCKED,
+    },
+  });
+
+  return result;
+
+  //
+};
+
 //
 export const authServices = {
   createUser,
   login,
   updateUser,
+  deleteUser,
 };
