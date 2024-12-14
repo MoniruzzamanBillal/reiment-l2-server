@@ -170,11 +170,7 @@ const getVendorProduct = async (shopId: string) => {
 const getAllProducts = async (options: IPaginationOptions, filter: any) => {
   const { page, limit, skip } = calculatePagination(options);
 
-  // console.log("user id = ", userId);
-  console.log(filter);
-  // console.log("page = ", page);
-  // console.log("limit = ", limit);
-  // console.log("skip = ", skip);
+  console.log("skip = ", skip);
 
   const andConditions = [];
 
@@ -210,7 +206,12 @@ const getAllProducts = async (options: IPaginationOptions, filter: any) => {
       AND: andConditions,
       isDelated: false,
     },
-    orderBy: { createdAt: "desc" },
+    // orderBy: { createdAt: "desc" },
+
+    orderBy:
+      options?.sortBy && options?.sortOrder
+        ? { [options?.sortBy]: options?.sortOrder }
+        : { createdAt: "desc" },
     include: {
       shop: true,
       category: true,
@@ -237,13 +238,13 @@ const getAllProducts = async (options: IPaginationOptions, filter: any) => {
 
     const sortedProducts = [...followedProducts, ...remainingProducts];
 
-    const paginatedProducts = sortedProducts.slice(skip, skip + limit);
+    // const paginatedProducts = sortedProducts.slice(skip, skip + limit);
 
-    return paginatedProducts;
+    return sortedProducts;
   } else {
-    const paginatedProducts = allProducts.slice(skip, skip + limit);
+    // const paginatedProducts = allProducts.slice(skip, skip + limit);
 
-    return paginatedProducts;
+    return allProducts;
   }
 
   //

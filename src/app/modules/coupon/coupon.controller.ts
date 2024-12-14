@@ -17,7 +17,7 @@ const addCoupon = catchAsync(async (req, res) => {
 
 // ! for getting single coupon
 const getSingleCoupon = catchAsync(async (req, res) => {
-  const result = await couponServices.getSingleCoupon(req.body?.couponCode);
+  const result = await couponServices.getSingleCoupon(req.body?.coupon);
 
   sendResponse(res, {
     status: httpStatus.CREATED,
