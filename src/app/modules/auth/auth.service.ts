@@ -361,16 +361,52 @@ const resetMailLink = async (email: string) => {
 
   const token = createToken(jwtPayload, config.jwt_secret as string, "5m");
 
-  // const resetLink = `https://rent-ride-ivory.vercel.app/reset-password/${token}`;
   const resetLink = `http://localhost:5173/reset-password/${token}`;
-
-  console.log(token);
 
   const sendMailResponse = await sendEmail(resetLink, email);
 
-  console.log(sendMailResponse);
-
   return sendMailResponse;
+};
+
+// ! for reseting password
+const resetPasswordFromDb = async (payload: {
+  userId: string;
+  password: string;
+}) => {
+  const { userId, password } = payload;
+
+  // ! check if  user exist
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  console.log(user);
+
+  if (!user) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User dont exist !!! ");
+  }
+
+  if (user?.isDelated) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is deleted !!");
+  }
+
+  if (user?.status === UserStatus.BLOCKED) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is blocked !!");
+  }
+
+  const hashedPassword = await bcrypt.hash(
+    password,
+    Number(config.bcrypt_salt_rounds)
+  );
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      password: hashedPassword,
+    },
+  });
+
+  return null;
 };
 
 //
@@ -384,4 +420,5 @@ export const authServices = {
   unblockVendor,
   changePassword,
   resetMailLink,
+  resetPasswordFromDb,
 };

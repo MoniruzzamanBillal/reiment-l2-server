@@ -74,6 +74,9 @@ router.patch(
   authController.change1stPassword
 );
 
+// ! for reseting password
+router.patch("/reset-password", authController.resetPassWord);
+
 // ! for sending reset link to email
 router.patch("/reset-link/:email", authController.sendResetLink);
 

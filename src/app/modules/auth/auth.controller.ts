@@ -129,6 +129,18 @@ const sendResetLink = catchAsync(async (req, res) => {
   });
 });
 
+// ! for reseting password
+const resetPassWord = catchAsync(async (req, res) => {
+  await authServices.resetPasswordFromDb(req?.body);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Password reset successfully  ",
+    data: { message: "success" },
+  });
+});
+
 //
 export const authController = {
   crateUser,
@@ -140,4 +152,5 @@ export const authController = {
   unbBlockVendor,
   change1stPassword,
   sendResetLink,
+  resetPassWord,
 };
