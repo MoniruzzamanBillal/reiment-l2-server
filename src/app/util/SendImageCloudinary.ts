@@ -11,6 +11,8 @@ cloudinary.config({
 });
 
 export const SendImageCloudinary = async (path: string, name: string) => {
+  console.log(path);
+  console.log(name);
   // Upload an image
   const uploadResult = await cloudinary.uploader
     .upload(path.trim(), {

@@ -15,8 +15,6 @@ const createUser = async (
   payload: Partial<TUser>,
   file: Partial<IFile> | undefined
 ) => {
-  console.log(payload);
-
   if (!payload.username || !payload.email || !payload.password) {
     throw new Error("Missing required fields: username, email, or password");
   }
@@ -33,7 +31,6 @@ const createUser = async (
     );
     profileImg = cloudinaryResponse?.secure_url;
   }
-  console.log(profileImg);
 
   const hashedPassword: string = await bcrypt.hash(payload?.password, 20);
 
@@ -379,8 +376,6 @@ const resetPasswordFromDb = async (payload: {
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
-
-  console.log(user);
 
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, "User dont exist !!! ");

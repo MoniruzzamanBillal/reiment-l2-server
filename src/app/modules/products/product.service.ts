@@ -10,11 +10,12 @@ import calculatePagination, {
   IPaginationOptions,
 } from "../../util/paginationHelper";
 import { productSearchableFields } from "./product.constants";
+import { ShopStatus } from "@prisma/client";
 
 // ! for crating a product
 const addProduct = async (payload: TShop, file: Partial<IFile> | undefined) => {
   const shopData = await prisma.shop.findUnique({
-    where: { id: payload?.shopId, isDelated: false },
+    where: { id: payload?.shopId, isDelated: false, status: ShopStatus.ACTIVE },
   });
 
   if (!shopData) {

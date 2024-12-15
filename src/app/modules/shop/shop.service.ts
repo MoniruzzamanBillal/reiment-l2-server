@@ -63,6 +63,7 @@ const updateShop = async (
       id: shopId,
       vendorId: user?.id,
       isDelated: false,
+      status: ShopStatus.ACTIVE,
     },
   });
 
@@ -89,6 +90,7 @@ const updateShop = async (
     where: {
       id: shopId,
       vendorId: user?.id,
+      status: ShopStatus.ACTIVE,
     },
     data: updatedData,
   });
@@ -119,7 +121,6 @@ const getVendorShop = async (userId: string) => {
   const result = await prisma.shop.findUnique({
     where: {
       vendorId: userId,
-      isDelated: false,
     },
   });
 
