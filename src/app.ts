@@ -10,12 +10,16 @@ import httpStatus from "http-status";
 const app: Application = express();
 
 app.use(express.json());
+
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://reiment-l2-client.vercel.app"],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(morgan("dev"));
 app.use(cookieParser());
 

@@ -34,7 +34,13 @@ const addCoupon = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return result;
 });
+// ! for getting all coupon
+const getAllCoupon = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.coupon.findMany();
+    return result;
+});
 const getSingleCoupon = (couponCode) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("coupon code = ", couponCode);
     const checkCoupon = yield prisma_1.default.coupon.findFirst({
         where: {
             code: {
@@ -48,8 +54,14 @@ const getSingleCoupon = (couponCode) => __awaiter(void 0, void 0, void 0, functi
     }
     return checkCoupon;
 });
+// ! delete coupon
+const handleDeleteCoupon = (couponId) => __awaiter(void 0, void 0, void 0, function* () {
+    yield prisma_1.default.coupon.delete({ where: { id: couponId } });
+});
 //
 exports.couponServices = {
     addCoupon,
     getSingleCoupon,
+    handleDeleteCoupon,
+    getAllCoupon,
 };

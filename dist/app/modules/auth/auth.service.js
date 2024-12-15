@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -47,7 +24,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authServices = void 0;
-const bcrypt = __importStar(require("bcrypt"));
 const prisma_1 = __importDefault(require("../../util/prisma"));
 const SendImageCloudinary_1 = require("../../util/SendImageCloudinary");
 const client_1 = require("@prisma/client");
@@ -68,8 +44,8 @@ const createUser = (payload, file) => __awaiter(void 0, void 0, void 0, function
         const cloudinaryResponse = yield (0, SendImageCloudinary_1.SendImageCloudinary)(path, name);
         profileImg = cloudinaryResponse === null || cloudinaryResponse === void 0 ? void 0 : cloudinaryResponse.secure_url;
     }
-    const hashedPassword = yield bcrypt.hash(payload === null || payload === void 0 ? void 0 : payload.password, 20);
-    payload.password = hashedPassword;
+    // const hashedPassword: string = await bcrypt.hash(payload?.password, 20);
+    // payload.password = hashedPassword;
     const userData = yield prisma_1.default.user.create({
         data: {
             username: payload.username,
@@ -96,14 +72,20 @@ const changePassword = (payload, userId) => __awaiter(void 0, void 0, void 0, fu
     if (!userData) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User dont exist!!!");
     }
-    const isPasswordMatch = yield bcrypt.compare(payload === null || payload === void 0 ? void 0 : payload.oldPassword, userData === null || userData === void 0 ? void 0 : userData.password);
-    if (!isPasswordMatch) {
+    // const isPasswordMatch = await bcrypt.compare(
+    //   payload?.oldPassword,
+    //   userData?.password
+    // );
+    if ((payload === null || payload === void 0 ? void 0 : payload.oldPassword) !== (userData === null || userData === void 0 ? void 0 : userData.password)) {
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, "Password don't match !!");
     }
-    const hashedPassword = yield bcrypt.hash(payload === null || payload === void 0 ? void 0 : payload.newPassword, Number(20));
+    // if (!isPasswordMatch) {
+    //   throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
+    // }
+    // const hashedPassword = await bcrypt.hash(payload?.newPassword, Number(20));
     const result = yield prisma_1.default.user.update({
         where: { id: userId },
-        data: { password: hashedPassword, needsPasswordChange: false },
+        data: { password: payload === null || payload === void 0 ? void 0 : payload.newPassword, needsPasswordChange: false },
     });
     return result;
     //
@@ -148,10 +130,13 @@ const login = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User is blocked by the admin !!!");
     }
     const { password: userPassword } = user, userData = __rest(user, ["password"]);
-    const isPasswordMatch = yield bcrypt.compare(payload === null || payload === void 0 ? void 0 : payload.password, userPassword);
-    if (!isPasswordMatch) {
+    if ((payload === null || payload === void 0 ? void 0 : payload.password) !== userPassword) {
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, "Password don't match !!");
     }
+    // const isPasswordMatch = await bcrypt.compare(payload?.password, userPassword);
+    // if (!isPasswordMatch) {
+    //   throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
+    // }
     const jwtPayload = {
         userId: user === null || user === void 0 ? void 0 : user.id,
         userEmail: user === null || user === void 0 ? void 0 : user.email,
@@ -336,11 +321,14 @@ const resetPasswordFromDb = (payload) => __awaiter(void 0, void 0, void 0, funct
     if ((user === null || user === void 0 ? void 0 : user.status) === client_1.UserStatus.BLOCKED) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User is blocked !!");
     }
-    const hashedPassword = yield bcrypt.hash(password, Number(config_1.default.bcrypt_salt_rounds));
+    // const hashedPassword = await bcrypt.hash(
+    //   password,
+    //   Number(config.bcrypt_salt_rounds)
+    // );
     yield prisma_1.default.user.update({
         where: { id: userId },
         data: {
-            password: hashedPassword,
+            password: password,
         },
     });
     return null;

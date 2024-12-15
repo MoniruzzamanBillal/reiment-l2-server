@@ -27,6 +27,16 @@ const addCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
         data: result,
     });
 }));
+// ! for getting all coupon
+const getAllCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield coupon_service_1.couponServices.getAllCoupon();
+    (0, sendResponse_1.default)(res, {
+        status: http_status_1.default.CREATED,
+        success: true,
+        message: "Coupon retrived successfully!!!",
+        data: result,
+    });
+}));
 // ! for getting single coupon
 const getSingleCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -38,8 +48,21 @@ const getSingleCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         data: result,
     });
 }));
+// ! for deleting coupon code
+const deleteCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    const result = yield coupon_service_1.couponServices.handleDeleteCoupon((_b = req.params) === null || _b === void 0 ? void 0 : _b.id);
+    (0, sendResponse_1.default)(res, {
+        status: http_status_1.default.CREATED,
+        success: true,
+        message: "Coupon deleted successfully!!!",
+        data: result,
+    });
+}));
 //
 exports.couponController = {
     addCoupon,
     getSingleCoupon,
+    deleteCoupon,
+    getAllCoupon,
 };

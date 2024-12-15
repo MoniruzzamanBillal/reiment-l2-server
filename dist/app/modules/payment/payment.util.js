@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyPay = exports.initiatePayment = void 0;
 const axios_1 = __importDefault(require("axios"));
 const config_1 = __importDefault(require("../../config"));
-const redirectLink = "https://reiment-l2-server.vercel.app/?vercelToolbarCode=C5yRO2za5aUWWbd/api";
+const redirectLink = "https://reiment-l2-server.vercel.app/api";
 // const redirectLink = "http://localhost:5000/api";
 // const cancelUrl = "http://localhost:3000/";
 const cancelUrl = "https://reiment-l2-client.vercel.app/";

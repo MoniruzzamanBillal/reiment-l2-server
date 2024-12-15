@@ -1,4 +1,4 @@
-import * as bcrypt from "bcrypt";
+// import * as bcrypt from "bcrypt";
 import { IFile } from "../../interface/file";
 import prisma from "../../util/prisma";
 import { SendImageCloudinary } from "../../util/SendImageCloudinary";
@@ -32,9 +32,9 @@ const createUser = async (
     profileImg = cloudinaryResponse?.secure_url;
   }
 
-  const hashedPassword: string = await bcrypt.hash(payload?.password, 20);
+  // const hashedPassword: string = await bcrypt.hash(payload?.password, 20);
 
-  payload.password = hashedPassword;
+  // payload.password = hashedPassword;
 
   const userData = await prisma.user.create({
     data: {
@@ -71,20 +71,24 @@ const changePassword = async (
     throw new AppError(httpStatus.NOT_FOUND, "User dont exist!!!");
   }
 
-  const isPasswordMatch = await bcrypt.compare(
-    payload?.oldPassword,
-    userData?.password
-  );
+  // const isPasswordMatch = await bcrypt.compare(
+  //   payload?.oldPassword,
+  //   userData?.password
+  // );
 
-  if (!isPasswordMatch) {
+  if (payload?.oldPassword !== userData?.password) {
     throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
   }
 
-  const hashedPassword = await bcrypt.hash(payload?.newPassword, Number(20));
+  // if (!isPasswordMatch) {
+  //   throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
+  // }
+
+  // const hashedPassword = await bcrypt.hash(payload?.newPassword, Number(20));
 
   const result = await prisma.user.update({
     where: { id: userId },
-    data: { password: hashedPassword, needsPasswordChange: false },
+    data: { password: payload?.newPassword, needsPasswordChange: false },
   });
 
   return result;
@@ -151,11 +155,15 @@ const login = async (payload: TLogin) => {
 
   const { password: userPassword, ...userData } = user;
 
-  const isPasswordMatch = await bcrypt.compare(payload?.password, userPassword);
-
-  if (!isPasswordMatch) {
+  if (payload?.password !== userPassword) {
     throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
   }
+
+  // const isPasswordMatch = await bcrypt.compare(payload?.password, userPassword);
+
+  // if (!isPasswordMatch) {
+  //   throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
+  // }
 
   const jwtPayload = {
     userId: user?.id,
@@ -389,15 +397,15 @@ const resetPasswordFromDb = async (payload: {
     throw new AppError(httpStatus.BAD_REQUEST, "User is blocked !!");
   }
 
-  const hashedPassword = await bcrypt.hash(
-    password,
-    Number(config.bcrypt_salt_rounds)
-  );
+  // const hashedPassword = await bcrypt.hash(
+  //   password,
+  //   Number(config.bcrypt_salt_rounds)
+  // );
 
   await prisma.user.update({
     where: { id: userId },
     data: {
-      password: hashedPassword,
+      password: password,
     },
   });
 
