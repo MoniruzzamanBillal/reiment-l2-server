@@ -7,11 +7,14 @@ import { authServices } from "./auth.service";
 const crateUser = catchAsync(async (req, res) => {
   const result = await authServices.createUser(req.body, req.file);
 
+  const { userData, token } = result;
+
   sendResponse(res, {
     status: httpStatus.OK,
     success: true,
     message: "User created successfully!!!",
-    data: result,
+    data: userData,
+    token: token,
   });
 });
 
@@ -102,6 +105,30 @@ const unbBlockVendor = catchAsync(async (req, res) => {
   });
 });
 
+// ! for changing password 1st time login
+const change1stPassword = catchAsync(async (req, res) => {
+  const result = await authServices.changePassword(req.body, req.user?.userId);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "password changed successfully!!!",
+    data: result,
+  });
+});
+
+// !send reset link to mail
+const sendResetLink = catchAsync(async (req, res) => {
+  const result = await authServices.resetMailLink(req?.params?.email);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Reset email sent successfully  ",
+    data: result,
+  });
+});
+
 //
 export const authController = {
   crateUser,
@@ -111,4 +138,6 @@ export const authController = {
   unblockUser,
   blockVendor,
   unbBlockVendor,
+  change1stPassword,
+  sendResetLink,
 };

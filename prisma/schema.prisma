@@ -8,22 +8,23 @@ datasource db {
 }
 
 model User {
-  id         String     @id @default(uuid())
-  username   String
-  email      String     @unique
-  password   String
-  profileImg String?
-  role       UserRole   @default(CUSTOMER)
-  isDelated  Boolean    @default(false)
-  status     UserStatus @default(ACTIVE)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  shop       Shop?
-  cart       Cart?
-  order      Order[]
-  address    Address[]
-  review     Review[]
-  follower   Follower[]
+  id                  String     @id @default(uuid())
+  username            String
+  email               String     @unique
+  password            String
+  profileImg          String?
+  role                UserRole   @default(CUSTOMER)
+  isDelated           Boolean    @default(false)
+  needsPasswordChange Boolean    @default(true)
+  status              UserStatus @default(ACTIVE)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  shop                Shop?
+  cart                Cart?
+  order               Order[]
+  address             Address[]
+  review              Review[]
+  follower            Follower[]
 
   @@map("users")
 }

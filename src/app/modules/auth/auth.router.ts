@@ -67,5 +67,15 @@ router.patch(
   authController.unbBlockVendor
 );
 
+// ! change password 1st time login
+router.patch(
+  "/change1st-password",
+  validateUser(UserRole.ADMIN, UserRole.VENDOR, UserRole.CUSTOMER),
+  authController.change1stPassword
+);
+
+// ! for sending reset link to email
+router.patch("/reset-link/:email", authController.sendResetLink);
+
 //
 export const authRouter = router;

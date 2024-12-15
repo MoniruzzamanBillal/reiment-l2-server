@@ -8,12 +8,15 @@ import AppError from "../../Error/AppError";
 import httpStatus from "http-status";
 import { createToken } from "./auth.util";
 import config from "../../config";
+import { sendEmail } from "../../util/sendEmail";
 
 // ! for creating user
 const createUser = async (
   payload: Partial<TUser>,
   file: Partial<IFile> | undefined
 ) => {
+  console.log(payload);
+
   if (!payload.username || !payload.email || !payload.password) {
     throw new Error("Missing required fields: username, email, or password");
   }
@@ -30,21 +33,65 @@ const createUser = async (
     );
     profileImg = cloudinaryResponse?.secure_url;
   }
+  console.log(profileImg);
 
   const hashedPassword: string = await bcrypt.hash(payload?.password, 20);
 
   payload.password = hashedPassword;
 
-  const result = await prisma.user.create({
+  const userData = await prisma.user.create({
     data: {
       username: payload.username,
       email: payload.email,
       password: payload.password,
       profileImg,
+      role: payload?.role,
     },
   });
 
+  const jwtPayload = {
+    userId: userData?.id,
+    userEmail: userData?.email,
+    userRole: userData?.role,
+  };
+
+  const token = createToken(jwtPayload, config.jwt_secret as string, "20d");
+
+  return {
+    userData,
+    token,
+  };
+};
+
+// ! for changing password
+const changePassword = async (
+  payload: { oldPassword: string; newPassword: string },
+  userId: string
+) => {
+  const userData = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (!userData) {
+    throw new AppError(httpStatus.NOT_FOUND, "User dont exist!!!");
+  }
+
+  const isPasswordMatch = await bcrypt.compare(
+    payload?.oldPassword,
+    userData?.password
+  );
+
+  if (!isPasswordMatch) {
+    throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
+  }
+
+  const hashedPassword = await bcrypt.hash(payload?.newPassword, Number(20));
+
+  const result = await prisma.user.update({
+    where: { id: userId },
+    data: { password: hashedPassword, needsPasswordChange: false },
+  });
+
   return result;
+  //
 };
 
 // ! for updating a user
@@ -284,6 +331,48 @@ const unblockVendor = async (payload: { vendorShopId: string }) => {
   //
 };
 
+// ! send mail for reseting password
+const resetMailLink = async (email: string) => {
+  const findUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!findUser) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User don't exist !!");
+  }
+
+  if (findUser?.isDelated) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is deleted !!");
+  }
+
+  if (findUser?.status === UserStatus.BLOCKED) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is blocked !!");
+  }
+
+  const userId = findUser?.id;
+
+  const jwtPayload = {
+    userId,
+    userRole: findUser?.role,
+    userEmail: findUser?.email,
+  };
+
+  const token = createToken(jwtPayload, config.jwt_secret as string, "5m");
+
+  // const resetLink = `https://rent-ride-ivory.vercel.app/reset-password/${token}`;
+  const resetLink = `http://localhost:5173/reset-password/${token}`;
+
+  console.log(token);
+
+  const sendMailResponse = await sendEmail(resetLink, email);
+
+  console.log(sendMailResponse);
+
+  return sendMailResponse;
+};
+
 //
 export const authServices = {
   createUser,
@@ -293,4 +382,6 @@ export const authServices = {
   unblockUser,
   blockVendorShop,
   unblockVendor,
+  changePassword,
+  resetMailLink,
 };

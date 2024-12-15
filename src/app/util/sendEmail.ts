@@ -6,17 +6,17 @@ export const sendEmail = async (
   receiverMail: string
 ) => {
   const transporter = nodemailer.createTransport({
-    host: config.nodemailer_host,
+    host: "smtp.gmail.com",
     port: 587,
     secure: false, // Use `true` for port 465, `false` for all other ports
     auth: {
-      user: config.nodemailer_sender,
-      pass: config.nodemailer_password,
+      user: "mdmoniruzzamanbillal2@gmail.com",
+      pass: "ilmf eeqw agtp mibf",
     },
   });
 
   const response = await transporter.sendMail({
-    from: config.nodemailer_sender, // sender address
+    from: "mdmoniruzzamanbillal2@gmail.com",
     to: receiverMail, // list of receivers
     subject: "Reset your password within 5 mins!",
     text: "", // plain text body

@@ -120,7 +120,11 @@ const getOrder = async (userId: string) => {
       isDelated: false,
     },
     include: {
-      orderItem: true,
+      orderItem: {
+        include: {
+          product: true,
+        },
+      },
     },
   });
 
