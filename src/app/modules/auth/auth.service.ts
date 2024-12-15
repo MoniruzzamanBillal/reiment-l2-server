@@ -366,7 +366,8 @@ const resetMailLink = async (email: string) => {
 
   const token = createToken(jwtPayload, config.jwt_secret as string, "5m");
 
-  const resetLink = `http://localhost:5173/reset-password/${token}`;
+  // const resetLink = `http://localhost:5173/reset-password/${token}`;
+  const resetLink = `https://reiment-l2-client.vercel.app/reset-password/${token}`;
 
   const sendMailResponse = await sendEmail(resetLink, email);
 

@@ -301,7 +301,8 @@ const resetMailLink = (email) => __awaiter(void 0, void 0, void 0, function* () 
         userEmail: findUser === null || findUser === void 0 ? void 0 : findUser.email,
     };
     const token = (0, auth_util_1.createToken)(jwtPayload, config_1.default.jwt_secret, "5m");
-    const resetLink = `http://localhost:5173/reset-password/${token}`;
+    // const resetLink = `http://localhost:5173/reset-password/${token}`;
+    const resetLink = `https://reiment-l2-client.vercel.app/reset-password/${token}`;
     const sendMailResponse = yield (0, sendEmail_1.sendEmail)(resetLink, email);
     return sendMailResponse;
 });
