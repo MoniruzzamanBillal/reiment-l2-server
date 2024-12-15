@@ -25,7 +25,14 @@ const addCoupon = async (payload: TCoupon) => {
   return result;
 };
 
+// ! for getting all coupon
+const getAllCoupon = async () => {
+  const result = await prisma.coupon.findMany();
+  return result;
+};
+
 const getSingleCoupon = async (couponCode: string) => {
+  console.log("coupon code = ", couponCode);
   const checkCoupon = await prisma.coupon.findFirst({
     where: {
       code: {
@@ -42,8 +49,15 @@ const getSingleCoupon = async (couponCode: string) => {
   return checkCoupon;
 };
 
+// ! delete coupon
+const handleDeleteCoupon = async (couponId: string) => {
+  await prisma.coupon.delete({ where: { id: couponId } });
+};
+
 //
 export const couponServices = {
   addCoupon,
   getSingleCoupon,
+  handleDeleteCoupon,
+  getAllCoupon,
 };

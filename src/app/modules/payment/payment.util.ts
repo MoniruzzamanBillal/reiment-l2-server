@@ -9,8 +9,11 @@ interface TPaymentData {
   userId: string;
 }
 
-const redirectLink = "http://localhost:5000/api";
-const cancelUrl = "http://localhost:3000/";
+const redirectLink =
+  "https://reiment-l2-server.vercel.app/?vercelToolbarCode=C5yRO2za5aUWWbd/api";
+// const redirectLink = "http://localhost:5000/api";
+// const cancelUrl = "http://localhost:3000/";
+const cancelUrl = "https://reiment-l2-client.vercel.app/";
 
 export const initiatePayment = async (paymentData: TPaymentData) => {
   const result = await axios.post(process.env.PAYMENT_URL!, {

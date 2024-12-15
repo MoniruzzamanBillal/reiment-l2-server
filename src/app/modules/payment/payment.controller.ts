@@ -1,7 +1,8 @@
 import catchAsync from "../../util/catchAsync";
 import { paymentServices } from "./payment.service";
 
-const redirectURL = "http://localhost:5173";
+// const redirectURL = "http://localhost:5173";
+const redirectURL = "https://reiment-l2-client.vercel.app";
 
 // ! for verify payment
 const verifyPayment = catchAsync(async (req, res) => {
