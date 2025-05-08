@@ -33,7 +33,7 @@ const createUser = async (
     profileImg = cloudinaryResponse?.secure_url;
   }
 
-  const hashedPassword: string = await argon2.hash(payload.password);
+  const hashedPassword: string = await argon2.hash(payload?.password);
 
   payload.password = hashedPassword;
 
@@ -53,7 +53,7 @@ const createUser = async (
     userRole: userData?.role,
   };
 
-  const token = createToken(jwtPayload, config.jwt_secret as string, "20d");
+  const token = createToken(jwtPayload, config.jwt_secret as string);
 
   return {
     userData,
@@ -72,24 +72,20 @@ const changePassword = async (
     throw new AppError(httpStatus.NOT_FOUND, "User dont exist!!!");
   }
 
-  // const isPasswordMatch = await bcrypt.compare(
-  //   payload?.oldPassword,
-  //   userData?.password
-  // );
+  const isPasswordMatch = await argon2.verify(
+    userData?.password,
+    payload?.oldPassword
+  );
 
-  if (payload?.oldPassword !== userData?.password) {
+  if (!isPasswordMatch) {
     throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
   }
 
-  // if (!isPasswordMatch) {
-  //   throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
-  // }
-
-  // const hashedPassword = await bcrypt.hash(payload?.newPassword, Number(20));
+  const hashedPassword: string = await argon2.hash(payload?.newPassword);
 
   const result = await prisma.user.update({
     where: { id: userId },
-    data: { password: payload?.newPassword, needsPasswordChange: false },
+    data: { password: hashedPassword, needsPasswordChange: false },
   });
 
   return result;
@@ -154,7 +150,10 @@ const login = async (payload: TLogin) => {
     );
   }
 
-  const isPasswordMatch = await argon2.verify(user.password, payload.password);
+  const isPasswordMatch = await argon2.verify(
+    user?.password,
+    payload?.password
+  );
 
   if (!isPasswordMatch) {
     throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
@@ -166,7 +165,7 @@ const login = async (payload: TLogin) => {
     userRole: user?.role,
   };
 
-  const token = createToken(jwtPayload, config.jwt_secret as string, "20d");
+  const token = createToken(jwtPayload, config.jwt_secret as string);
 
   return {
     user,
@@ -359,7 +358,7 @@ const resetMailLink = async (email: string) => {
     userEmail: findUser?.email,
   };
 
-  const token = createToken(jwtPayload, config.jwt_secret as string, "5m");
+  const token = createToken(jwtPayload, config.jwt_secret as string);
 
   // const resetLink = `http://localhost:5173/reset-password/${token}`;
   const resetLink = `https://reiment-l2-client.vercel.app/reset-password/${token}`;
@@ -374,7 +373,7 @@ const resetPasswordFromDb = async (payload: {
   userId: string;
   password: string;
 }) => {
-  const { userId, password } = payload;
+  const { userId } = payload;
 
   // ! check if  user exist
   const user = await prisma.user.findUnique({
@@ -393,15 +392,12 @@ const resetPasswordFromDb = async (payload: {
     throw new AppError(httpStatus.BAD_REQUEST, "User is blocked !!");
   }
 
-  // const hashedPassword = await bcrypt.hash(
-  //   password,
-  //   Number(config.bcrypt_salt_rounds)
-  // );
+  const hashedPassword: string = await argon2.hash(payload?.password);
 
   await prisma.user.update({
     where: { id: userId },
     data: {
-      password: password,
+      password: hashedPassword,
     },
   });
 
