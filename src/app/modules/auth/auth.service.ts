@@ -1,16 +1,15 @@
 // import * as bcrypt from "bcrypt";
+import { ShopStatus, UserStatus } from "@prisma/client";
+import argon2 from "argon2";
+import httpStatus from "http-status";
+import config from "../../config";
+import AppError from "../../Error/AppError";
 import { IFile } from "../../interface/file";
 import prisma from "../../util/prisma";
+import { sendEmail } from "../../util/sendEmail";
 import { SendImageCloudinary } from "../../util/SendImageCloudinary";
 import { TLogin, TUser } from "../user/user.interface";
-import { ShopStatus, UserStatus } from "@prisma/client";
-import AppError from "../../Error/AppError";
-import httpStatus from "http-status";
 import { createToken } from "./auth.util";
-import config from "../../config";
-import { sendEmail } from "../../util/sendEmail";
-import bcrypt from "bcrypt";
-import argon2 from "argon2";
 
 // ! for creating user
 const createUser = async (
@@ -155,12 +154,7 @@ const login = async (payload: TLogin) => {
     );
   }
 
-  const isPasswordMatch = await bcrypt.compare(
-    payload?.password,
-    user?.password
-  );
-
-  console.log(isPasswordMatch);
+  const isPasswordMatch = await argon2.verify(user.password, payload.password);
 
   if (!isPasswordMatch) {
     throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
