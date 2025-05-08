@@ -8,8 +8,6 @@ let server: Server;
 
 async function Main() {
   try {
-    // await mongoose.connect(config.database_url as string);
-
     app.listen(config.port, () => {
       console.log(`listening from port ${config.port}`);
     });

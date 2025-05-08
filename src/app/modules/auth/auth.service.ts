@@ -9,6 +9,8 @@ import httpStatus from "http-status";
 import { createToken } from "./auth.util";
 import config from "../../config";
 import { sendEmail } from "../../util/sendEmail";
+import bcrypt from "bcrypt";
+import argon2 from "argon2";
 
 // ! for creating user
 const createUser = async (
@@ -32,9 +34,9 @@ const createUser = async (
     profileImg = cloudinaryResponse?.secure_url;
   }
 
-  // const hashedPassword: string = await bcrypt.hash(payload?.password, 20);
+  const hashedPassword: string = await argon2.hash(payload.password);
 
-  // payload.password = hashedPassword;
+  payload.password = hashedPassword;
 
   const userData = await prisma.user.create({
     data: {
@@ -153,17 +155,16 @@ const login = async (payload: TLogin) => {
     );
   }
 
-  const { password: userPassword, ...userData } = user;
+  const isPasswordMatch = await bcrypt.compare(
+    payload?.password,
+    user?.password
+  );
 
-  if (payload?.password !== userPassword) {
+  console.log(isPasswordMatch);
+
+  if (!isPasswordMatch) {
     throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
   }
-
-  // const isPasswordMatch = await bcrypt.compare(payload?.password, userPassword);
-
-  // if (!isPasswordMatch) {
-  //   throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
-  // }
 
   const jwtPayload = {
     userId: user?.id,
@@ -174,7 +175,7 @@ const login = async (payload: TLogin) => {
   const token = createToken(jwtPayload, config.jwt_secret as string, "20d");
 
   return {
-    userData,
+    user,
     token,
   };
 };
