@@ -38,7 +38,7 @@ const updateUser = catchAsync(async (req, res) => {
 const signIn = catchAsync(async (req, res) => {
   const result = await authServices.login(req.body);
 
-  const { userData, token } = result;
+  const { user, token } = result;
   const modifiedToken = `Bearer ${token}`;
 
   res.cookie("token", modifiedToken, {
@@ -52,7 +52,7 @@ const signIn = catchAsync(async (req, res) => {
     status: httpStatus.OK,
     success: true,
     message: "User logged in successfully!!!",
-    data: userData,
+    data: user,
     token: token,
   });
 });

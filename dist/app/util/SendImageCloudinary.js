@@ -24,8 +24,6 @@ cloudinary_1.v2.config({
     api_secret: config_1.default.cloudinary_api_secret,
 });
 const SendImageCloudinary = (path, name) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(path);
-    console.log(name);
     // Upload an image
     const uploadResult = yield cloudinary_1.v2.uploader
         .upload(path.trim(), {

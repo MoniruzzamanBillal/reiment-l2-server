@@ -30,8 +30,8 @@ const getLoggedUserData = (0, catchAsync_1.default)((req, res) => __awaiter(void
 }));
 // ! for following a shop
 const followShop = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b, _c;
-    const result = yield follower_service_1.followerService.followShop((_b = req.body) === null || _b === void 0 ? void 0 : _b.shopId, (_c = req.user) === null || _c === void 0 ? void 0 : _c.userId);
+    var _a, _b;
+    const result = yield follower_service_1.followerService.followShop((_a = req.body) === null || _a === void 0 ? void 0 : _a.shopId, (_b = req.user) === null || _b === void 0 ? void 0 : _b.userId);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,
@@ -41,8 +41,8 @@ const followShop = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
 }));
 // ! for unfollowing a shop
 const unfollowShop = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d, _e;
-    const result = yield follower_service_1.followerService.unfollowShop((_d = req.body) === null || _d === void 0 ? void 0 : _d.shopId, (_e = req.user) === null || _e === void 0 ? void 0 : _e.userId);
+    var _a, _b;
+    const result = yield follower_service_1.followerService.unfollowShop((_a = req.body) === null || _a === void 0 ? void 0 : _a.shopId, (_b = req.user) === null || _b === void 0 ? void 0 : _b.userId);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,

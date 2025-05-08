@@ -8,30 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authServices = void 0;
-const prisma_1 = __importDefault(require("../../util/prisma"));
-const SendImageCloudinary_1 = require("../../util/SendImageCloudinary");
+// import * as bcrypt from "bcrypt";
 const client_1 = require("@prisma/client");
-const AppError_1 = __importDefault(require("../../Error/AppError"));
+const argon2_1 = __importDefault(require("argon2"));
 const http_status_1 = __importDefault(require("http-status"));
-const auth_util_1 = require("./auth.util");
 const config_1 = __importDefault(require("../../config"));
+const AppError_1 = __importDefault(require("../../Error/AppError"));
+const prisma_1 = __importDefault(require("../../util/prisma"));
 const sendEmail_1 = require("../../util/sendEmail");
+const SendImageCloudinary_1 = require("../../util/SendImageCloudinary");
+const auth_util_1 = require("./auth.util");
 // ! for creating user
 const createUser = (payload, file) => __awaiter(void 0, void 0, void 0, function* () {
     if (!payload.username || !payload.email || !payload.password) {
@@ -44,8 +35,8 @@ const createUser = (payload, file) => __awaiter(void 0, void 0, void 0, function
         const cloudinaryResponse = yield (0, SendImageCloudinary_1.SendImageCloudinary)(path, name);
         profileImg = cloudinaryResponse === null || cloudinaryResponse === void 0 ? void 0 : cloudinaryResponse.secure_url;
     }
-    // const hashedPassword: string = await bcrypt.hash(payload?.password, 20);
-    // payload.password = hashedPassword;
+    const hashedPassword = yield argon2_1.default.hash(payload.password);
+    payload.password = hashedPassword;
     const userData = yield prisma_1.default.user.create({
         data: {
             username: payload.username,
@@ -129,14 +120,10 @@ const login = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (user === null || user === void 0 ? void 0 : user.isDelated) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User is blocked by the admin !!!");
     }
-    const { password: userPassword } = user, userData = __rest(user, ["password"]);
-    if ((payload === null || payload === void 0 ? void 0 : payload.password) !== userPassword) {
+    const isPasswordMatch = yield argon2_1.default.verify(user.password, payload.password);
+    if (!isPasswordMatch) {
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, "Password don't match !!");
     }
-    // const isPasswordMatch = await bcrypt.compare(payload?.password, userPassword);
-    // if (!isPasswordMatch) {
-    //   throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
-    // }
     const jwtPayload = {
         userId: user === null || user === void 0 ? void 0 : user.id,
         userEmail: user === null || user === void 0 ? void 0 : user.email,
@@ -144,7 +131,7 @@ const login = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     };
     const token = (0, auth_util_1.createToken)(jwtPayload, config_1.default.jwt_secret, "20d");
     return {
-        userData,
+        user,
         token,
     };
 });

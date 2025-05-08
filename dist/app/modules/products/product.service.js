@@ -80,7 +80,7 @@ const updateProduct = (payload, file, prodId) => __awaiter(void 0, void 0, void 
 });
 // ! for deleting porduct
 const deleteProduct = (prodId, vendorUser) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
+    var _a;
     const prodData = yield prisma_1.default.products.findUnique({
         where: { id: prodId, isDelated: false },
         include: { shop: true },
@@ -88,7 +88,7 @@ const deleteProduct = (prodId, vendorUser) => __awaiter(void 0, void 0, void 0, 
     if (!prodData) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Product not found !!!");
     }
-    if ((vendorUser === null || vendorUser === void 0 ? void 0 : vendorUser.userId) !== ((_c = prodData === null || prodData === void 0 ? void 0 : prodData.shop) === null || _c === void 0 ? void 0 : _c.vendorId)) {
+    if ((vendorUser === null || vendorUser === void 0 ? void 0 : vendorUser.userId) !== ((_a = prodData === null || prodData === void 0 ? void 0 : prodData.shop) === null || _a === void 0 ? void 0 : _a.vendorId)) {
         throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "Only owner can delete this prisuct !!");
     }
     yield prisma_1.default.$transaction((trxnCllient) => __awaiter(void 0, void 0, void 0, function* () {
@@ -136,7 +136,7 @@ const getVendorProduct = (shopId) => __awaiter(void 0, void 0, void 0, function*
 // ! for getting all product data
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getAllProducts = (options, filter) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d;
+    var _a;
     const { page, limit, skip } = (0, paginationHelper_1.default)(options);
     console.log("skip = ", skip);
     const andConditions = [];
@@ -184,7 +184,7 @@ const getAllProducts = (options, filter) => __awaiter(void 0, void 0, void 0, fu
                 follower: true,
             },
         });
-        const followShopId = (_d = userData === null || userData === void 0 ? void 0 : userData.follower) === null || _d === void 0 ? void 0 : _d.map((follow) => follow === null || follow === void 0 ? void 0 : follow.shopId);
+        const followShopId = (_a = userData === null || userData === void 0 ? void 0 : userData.follower) === null || _a === void 0 ? void 0 : _a.map((follow) => follow === null || follow === void 0 ? void 0 : follow.shopId);
         const followedProducts = allProducts === null || allProducts === void 0 ? void 0 : allProducts.filter((product) => followShopId === null || followShopId === void 0 ? void 0 : followShopId.includes(product.shopId));
         const remainingProducts = allProducts === null || allProducts === void 0 ? void 0 : allProducts.filter((product) => !(followShopId === null || followShopId === void 0 ? void 0 : followShopId.includes(product.shopId)));
         const sortedProducts = [...followedProducts, ...remainingProducts];

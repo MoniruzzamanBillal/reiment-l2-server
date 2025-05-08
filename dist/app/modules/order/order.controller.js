@@ -30,8 +30,8 @@ const orderItem = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
 }));
 // ! for getting order
 const getUserOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const result = yield order_service_1.orderServices.getOrder((_b = req.user) === null || _b === void 0 ? void 0 : _b.userId);
+    var _a;
+    const result = yield order_service_1.orderServices.getOrder((_a = req.user) === null || _a === void 0 ? void 0 : _a.userId);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,
@@ -41,8 +41,8 @@ const getUserOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
 }));
 // ! for getting vendor shops order item products
 const getVendorOrderHistory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const result = yield order_service_1.orderServices.getVendorOrderHistory((_c = req.user) === null || _c === void 0 ? void 0 : _c.userId);
+    var _a;
+    const result = yield order_service_1.orderServices.getVendorOrderHistory((_a = req.user) === null || _a === void 0 ? void 0 : _a.userId);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,

@@ -30,8 +30,8 @@ const addReview = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
 }));
 // ! for checking eligibility for order
 const checkEligibleForReview = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b, _c;
-    const result = yield review_services_1.reviewServices.checkEligibleFroReview((_b = req.params) === null || _b === void 0 ? void 0 : _b.id, (_c = req.user) === null || _c === void 0 ? void 0 : _c.userId);
+    var _a, _b;
+    const result = yield review_services_1.reviewServices.checkEligibleFroReview((_a = req.params) === null || _a === void 0 ? void 0 : _a.id, (_b = req.user) === null || _b === void 0 ? void 0 : _b.userId);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.CREATED,
         success: true,
@@ -41,8 +41,8 @@ const checkEligibleForReview = (0, catchAsync_1.default)((req, res) => __awaiter
 }));
 // ! get vendor shops product review
 const getVendorProductReviews = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d;
-    const result = yield review_services_1.reviewServices.getVendorProductReviews((_d = req.user) === null || _d === void 0 ? void 0 : _d.userId);
+    var _a;
+    const result = yield review_services_1.reviewServices.getVendorProductReviews((_a = req.user) === null || _a === void 0 ? void 0 : _a.userId);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.CREATED,
         success: true,

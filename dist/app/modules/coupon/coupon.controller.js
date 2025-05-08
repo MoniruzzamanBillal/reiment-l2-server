@@ -50,8 +50,8 @@ const getSingleCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
 }));
 // ! for deleting coupon code
 const deleteCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const result = yield coupon_service_1.couponServices.handleDeleteCoupon((_b = req.params) === null || _b === void 0 ? void 0 : _b.id);
+    var _a;
+    const result = yield coupon_service_1.couponServices.handleDeleteCoupon((_a = req.params) === null || _a === void 0 ? void 0 : _a.id);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.CREATED,
         success: true,

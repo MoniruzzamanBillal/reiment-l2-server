@@ -30,8 +30,8 @@ const crateShop = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
 }));
 // ! for updating shop data
 const updateShopData = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b, _c;
-    const result = yield shop_service_1.shopServices.updateShop(req.body, (_b = req.user) === null || _b === void 0 ? void 0 : _b.userId, req.file, (_c = req.params) === null || _c === void 0 ? void 0 : _c.id);
+    var _a, _b;
+    const result = yield shop_service_1.shopServices.updateShop(req.body, (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId, req.file, (_b = req.params) === null || _b === void 0 ? void 0 : _b.id);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,
@@ -51,8 +51,8 @@ const getAllShopData = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
 }));
 // ! for getting vendor shop
 const getVendorShop = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d;
-    const result = yield shop_service_1.shopServices.getVendorShop((_d = req.user) === null || _d === void 0 ? void 0 : _d.userId);
+    var _a;
+    const result = yield shop_service_1.shopServices.getVendorShop((_a = req.user) === null || _a === void 0 ? void 0 : _a.userId);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,
@@ -62,8 +62,8 @@ const getVendorShop = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
 }));
 // ! for getting single shop data
 const getSingleShop = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _e;
-    const result = yield shop_service_1.shopServices.getSingleShop((_e = req.params) === null || _e === void 0 ? void 0 : _e.id);
+    var _a;
+    const result = yield shop_service_1.shopServices.getSingleShop((_a = req.params) === null || _a === void 0 ? void 0 : _a.id);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,

@@ -41,8 +41,8 @@ const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
 }));
 // ! for deleting a product
 const deleteProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    yield product_service_1.productServices.deleteProduct((_b = req.params) === null || _b === void 0 ? void 0 : _b.id, req.user);
+    var _a;
+    yield product_service_1.productServices.deleteProduct((_a = req.params) === null || _a === void 0 ? void 0 : _a.id, req.user);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,
@@ -51,8 +51,8 @@ const deleteProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
 }));
 // ! for getting vendor shops product
 const getVendorShopProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const result = yield product_service_1.productServices.getVendorProduct((_c = req.params) === null || _c === void 0 ? void 0 : _c.id);
+    var _a;
+    const result = yield product_service_1.productServices.getVendorProduct((_a = req.params) === null || _a === void 0 ? void 0 : _a.id);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,
@@ -101,8 +101,8 @@ const getRecentProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void
 }));
 // ! for category related products
 const getRelatedProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d;
-    const result = yield product_service_1.productServices.getRelatedProducts((_d = req.params) === null || _d === void 0 ? void 0 : _d.id);
+    var _a;
+    const result = yield product_service_1.productServices.getRelatedProducts((_a = req.params) === null || _a === void 0 ? void 0 : _a.id);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,
@@ -112,8 +112,8 @@ const getRelatedProducts = (0, catchAsync_1.default)((req, res) => __awaiter(voi
 }));
 // ! for getting single product
 const getSingleProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _e;
-    const result = yield product_service_1.productServices.getSingleProduct((_e = req.params) === null || _e === void 0 ? void 0 : _e.id);
+    var _a;
+    const result = yield product_service_1.productServices.getSingleProduct((_a = req.params) === null || _a === void 0 ? void 0 : _a.id);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,

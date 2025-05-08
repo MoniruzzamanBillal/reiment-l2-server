@@ -43,7 +43,7 @@ const updateUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
 // ! for login
 const signIn = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.authServices.login(req.body);
-    const { userData, token } = result;
+    const { user, token } = result;
     const modifiedToken = `Bearer ${token}`;
     res.cookie("token", modifiedToken, {
         secure: false,
@@ -55,7 +55,7 @@ const signIn = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0,
         status: http_status_1.default.OK,
         success: true,
         message: "User logged in successfully!!!",
-        data: userData,
+        data: user,
         token: token,
     });
 }));
@@ -101,8 +101,8 @@ const unbBlockVendor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
 }));
 // ! for changing password 1st time login
 const change1stPassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const result = yield auth_service_1.authServices.changePassword(req.body, (_b = req.user) === null || _b === void 0 ? void 0 : _b.userId);
+    var _a;
+    const result = yield auth_service_1.authServices.changePassword(req.body, (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,
@@ -112,8 +112,8 @@ const change1stPassword = (0, catchAsync_1.default)((req, res) => __awaiter(void
 }));
 // !send reset link to mail
 const sendResetLink = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const result = yield auth_service_1.authServices.resetMailLink((_c = req === null || req === void 0 ? void 0 : req.params) === null || _c === void 0 ? void 0 : _c.email);
+    var _a;
+    const result = yield auth_service_1.authServices.resetMailLink((_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.email);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,
         success: true,
