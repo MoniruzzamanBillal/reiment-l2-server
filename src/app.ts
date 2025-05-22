@@ -13,7 +13,11 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://reiment-l2-client.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "https://reiment-l2-client.vercel.app",
+      "https://reimentl2.vercel.app/",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],

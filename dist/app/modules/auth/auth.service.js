@@ -35,7 +35,7 @@ const createUser = (payload, file) => __awaiter(void 0, void 0, void 0, function
         const cloudinaryResponse = yield (0, SendImageCloudinary_1.SendImageCloudinary)(path, name);
         profileImg = cloudinaryResponse === null || cloudinaryResponse === void 0 ? void 0 : cloudinaryResponse.secure_url;
     }
-    const hashedPassword = yield argon2_1.default.hash(payload.password);
+    const hashedPassword = yield argon2_1.default.hash(payload === null || payload === void 0 ? void 0 : payload.password);
     payload.password = hashedPassword;
     const userData = yield prisma_1.default.user.create({
         data: {
@@ -51,7 +51,7 @@ const createUser = (payload, file) => __awaiter(void 0, void 0, void 0, function
         userEmail: userData === null || userData === void 0 ? void 0 : userData.email,
         userRole: userData === null || userData === void 0 ? void 0 : userData.role,
     };
-    const token = (0, auth_util_1.createToken)(jwtPayload, config_1.default.jwt_secret, "20d");
+    const token = (0, auth_util_1.createToken)(jwtPayload, config_1.default.jwt_secret);
     return {
         userData,
         token,
@@ -63,20 +63,14 @@ const changePassword = (payload, userId) => __awaiter(void 0, void 0, void 0, fu
     if (!userData) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User dont exist!!!");
     }
-    // const isPasswordMatch = await bcrypt.compare(
-    //   payload?.oldPassword,
-    //   userData?.password
-    // );
-    if ((payload === null || payload === void 0 ? void 0 : payload.oldPassword) !== (userData === null || userData === void 0 ? void 0 : userData.password)) {
+    const isPasswordMatch = yield argon2_1.default.verify(userData === null || userData === void 0 ? void 0 : userData.password, payload === null || payload === void 0 ? void 0 : payload.oldPassword);
+    if (!isPasswordMatch) {
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, "Password don't match !!");
     }
-    // if (!isPasswordMatch) {
-    //   throw new AppError(httpStatus.FORBIDDEN, "Password don't match !!");
-    // }
-    // const hashedPassword = await bcrypt.hash(payload?.newPassword, Number(20));
+    const hashedPassword = yield argon2_1.default.hash(payload === null || payload === void 0 ? void 0 : payload.newPassword);
     const result = yield prisma_1.default.user.update({
         where: { id: userId },
-        data: { password: payload === null || payload === void 0 ? void 0 : payload.newPassword, needsPasswordChange: false },
+        data: { password: hashedPassword, needsPasswordChange: false },
     });
     return result;
     //
@@ -120,7 +114,7 @@ const login = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (user === null || user === void 0 ? void 0 : user.isDelated) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User is blocked by the admin !!!");
     }
-    const isPasswordMatch = yield argon2_1.default.verify(user.password, payload.password);
+    const isPasswordMatch = yield argon2_1.default.verify(user === null || user === void 0 ? void 0 : user.password, payload === null || payload === void 0 ? void 0 : payload.password);
     if (!isPasswordMatch) {
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, "Password don't match !!");
     }
@@ -129,7 +123,7 @@ const login = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         userEmail: user === null || user === void 0 ? void 0 : user.email,
         userRole: user === null || user === void 0 ? void 0 : user.role,
     };
-    const token = (0, auth_util_1.createToken)(jwtPayload, config_1.default.jwt_secret, "20d");
+    const token = (0, auth_util_1.createToken)(jwtPayload, config_1.default.jwt_secret);
     return {
         user,
         token,
@@ -287,7 +281,7 @@ const resetMailLink = (email) => __awaiter(void 0, void 0, void 0, function* () 
         userRole: findUser === null || findUser === void 0 ? void 0 : findUser.role,
         userEmail: findUser === null || findUser === void 0 ? void 0 : findUser.email,
     };
-    const token = (0, auth_util_1.createToken)(jwtPayload, config_1.default.jwt_secret, "5m");
+    const token = (0, auth_util_1.createToken)(jwtPayload, config_1.default.jwt_secret);
     // const resetLink = `http://localhost:5173/reset-password/${token}`;
     const resetLink = `https://reiment-l2-client.vercel.app/reset-password/${token}`;
     const sendMailResponse = yield (0, sendEmail_1.sendEmail)(resetLink, email);
@@ -295,7 +289,7 @@ const resetMailLink = (email) => __awaiter(void 0, void 0, void 0, function* () 
 });
 // ! for reseting password
 const resetPasswordFromDb = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, password } = payload;
+    const { userId } = payload;
     // ! check if  user exist
     const user = yield prisma_1.default.user.findUnique({
         where: { id: userId },
@@ -309,14 +303,11 @@ const resetPasswordFromDb = (payload) => __awaiter(void 0, void 0, void 0, funct
     if ((user === null || user === void 0 ? void 0 : user.status) === client_1.UserStatus.BLOCKED) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User is blocked !!");
     }
-    // const hashedPassword = await bcrypt.hash(
-    //   password,
-    //   Number(config.bcrypt_salt_rounds)
-    // );
+    const hashedPassword = yield argon2_1.default.hash(payload === null || payload === void 0 ? void 0 : payload.password);
     yield prisma_1.default.user.update({
         where: { id: userId },
         data: {
-            password: password,
+            password: hashedPassword,
         },
     });
     return null;
