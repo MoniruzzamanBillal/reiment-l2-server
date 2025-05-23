@@ -170,9 +170,7 @@ const getVendorProduct = async (shopId: string) => {
 // ! for getting all product data
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getAllProducts = async (options: IPaginationOptions, filter: any) => {
-  const { page, limit, skip } = calculatePagination(options);
-
-  console.log("skip = ", skip);
+  const { limit, skip } = calculatePagination(options);
 
   const andConditions = [];
 
@@ -208,46 +206,19 @@ const getAllProducts = async (options: IPaginationOptions, filter: any) => {
       AND: andConditions,
       isDelated: false,
     },
-    // orderBy: { createdAt: "desc" },
-
     orderBy:
       options?.sortBy && options?.sortOrder
         ? { [options?.sortBy]: options?.sortOrder }
         : { createdAt: "desc" },
+    skip,
+    take: limit,
     include: {
       shop: true,
       category: true,
     },
   });
 
-  if (filter?.userId) {
-    const userData = await prisma.user.findUnique({
-      where: { id: filter?.userId },
-      include: {
-        follower: true,
-      },
-    });
-
-    const followShopId = userData?.follower?.map((follow) => follow?.shopId);
-
-    const followedProducts = allProducts?.filter((product) =>
-      followShopId?.includes(product.shopId)
-    );
-
-    const remainingProducts = allProducts?.filter(
-      (product) => !followShopId?.includes(product.shopId)
-    );
-
-    const sortedProducts = [...followedProducts, ...remainingProducts];
-
-    // const paginatedProducts = sortedProducts.slice(skip, skip + limit);
-
-    return sortedProducts;
-  } else {
-    // const paginatedProducts = allProducts.slice(skip, skip + limit);
-
-    return allProducts;
-  }
+  return allProducts;
 
   //
 };

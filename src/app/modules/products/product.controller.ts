@@ -57,8 +57,6 @@ const getVendorShopProducts = catchAsync(async (req, res) => {
 
 // ! for getting all products data
 const getAllProducts = catchAsync(async (req, res) => {
-  console.log("query from get all products = ", req.query);
-
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
   const filter = pick(req.query, [
     "searchTerm",
