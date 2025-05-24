@@ -2,15 +2,15 @@ import httpStatus from "http-status";
 import AppError from "../../Error/AppError";
 import { IFile } from "../../interface/file";
 
-import prisma from "../../util/prisma";
-import { SendImageCloudinary } from "../../util/SendImageCloudinary";
-import { TShop } from "./product.interface";
+import { ShopStatus } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import calculatePagination, {
   IPaginationOptions,
 } from "../../util/paginationHelper";
+import prisma from "../../util/prisma";
+import { SendImageCloudinary } from "../../util/SendImageCloudinary";
 import { productSearchableFields } from "./product.constants";
-import { ShopStatus } from "@prisma/client";
+import { TShop } from "./product.interface";
 
 // ! for crating a product
 const addProduct = async (payload: TShop, file: Partial<IFile> | undefined) => {
@@ -218,7 +218,18 @@ const getAllProducts = async (options: IPaginationOptions, filter: any) => {
     },
   });
 
-  return allProducts;
+  const totalItems = await prisma.products.count({
+    where: { isDelated: false },
+  });
+
+  return {
+    data: allProducts,
+    meta: {
+      totalItems,
+      page: options?.page,
+      limit: options?.limit,
+    },
+  };
 
   //
 };

@@ -14,7 +14,7 @@ export type IPaginationOptions = {
 
 const calculatePagination = (options: IOptions) => {
   const page: number = Number(options?.page) || 1;
-  const limit: number = Number(options?.limit) || 10;
+  const limit: number = Number(options?.limit) || 9;
   const skip: number = (Number(page) - 1) * limit;
 
   const sortBy: string = options.sortBy || "createdAt";

@@ -15,11 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.productServices = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../Error/AppError"));
+const client_1 = require("@prisma/client");
+const paginationHelper_1 = __importDefault(require("../../util/paginationHelper"));
 const prisma_1 = __importDefault(require("../../util/prisma"));
 const SendImageCloudinary_1 = require("../../util/SendImageCloudinary");
-const paginationHelper_1 = __importDefault(require("../../util/paginationHelper"));
 const product_constants_1 = require("./product.constants");
-const client_1 = require("@prisma/client");
 // ! for crating a product
 const addProduct = (payload, file) => __awaiter(void 0, void 0, void 0, function* () {
     const shopData = yield prisma_1.default.shop.findUnique({
@@ -136,9 +136,7 @@ const getVendorProduct = (shopId) => __awaiter(void 0, void 0, void 0, function*
 // ! for getting all product data
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getAllProducts = (options, filter) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const { page, limit, skip } = (0, paginationHelper_1.default)(options);
-    console.log("skip = ", skip);
+    const { limit, skip } = (0, paginationHelper_1.default)(options);
     const andConditions = [];
     const searchConditions = product_constants_1.productSearchableFields.map((field) => ({
         [field]: {
@@ -168,33 +166,27 @@ const getAllProducts = (options, filter) => __awaiter(void 0, void 0, void 0, fu
             AND: andConditions,
             isDelated: false,
         },
-        // orderBy: { createdAt: "desc" },
         orderBy: (options === null || options === void 0 ? void 0 : options.sortBy) && (options === null || options === void 0 ? void 0 : options.sortOrder)
             ? { [options === null || options === void 0 ? void 0 : options.sortBy]: options === null || options === void 0 ? void 0 : options.sortOrder }
             : { createdAt: "desc" },
+        skip,
+        take: limit,
         include: {
             shop: true,
             category: true,
         },
     });
-    if (filter === null || filter === void 0 ? void 0 : filter.userId) {
-        const userData = yield prisma_1.default.user.findUnique({
-            where: { id: filter === null || filter === void 0 ? void 0 : filter.userId },
-            include: {
-                follower: true,
-            },
-        });
-        const followShopId = (_a = userData === null || userData === void 0 ? void 0 : userData.follower) === null || _a === void 0 ? void 0 : _a.map((follow) => follow === null || follow === void 0 ? void 0 : follow.shopId);
-        const followedProducts = allProducts === null || allProducts === void 0 ? void 0 : allProducts.filter((product) => followShopId === null || followShopId === void 0 ? void 0 : followShopId.includes(product.shopId));
-        const remainingProducts = allProducts === null || allProducts === void 0 ? void 0 : allProducts.filter((product) => !(followShopId === null || followShopId === void 0 ? void 0 : followShopId.includes(product.shopId)));
-        const sortedProducts = [...followedProducts, ...remainingProducts];
-        // const paginatedProducts = sortedProducts.slice(skip, skip + limit);
-        return sortedProducts;
-    }
-    else {
-        // const paginatedProducts = allProducts.slice(skip, skip + limit);
-        return allProducts;
-    }
+    const totalItems = yield prisma_1.default.products.count({
+        where: { isDelated: false },
+    });
+    return {
+        data: allProducts,
+        meta: {
+            totalItems,
+            page: options === null || options === void 0 ? void 0 : options.page,
+            limit: options === null || options === void 0 ? void 0 : options.limit,
+        },
+    };
     //
 });
 // ! for getting flash sale products

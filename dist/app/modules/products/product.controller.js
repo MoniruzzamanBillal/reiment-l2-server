@@ -62,7 +62,6 @@ const getVendorShopProducts = (0, catchAsync_1.default)((req, res) => __awaiter(
 }));
 // ! for getting all products data
 const getAllProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("query from get all products = ", req.query);
     const options = (0, pick_1.default)(req.query, ["limit", "page", "sortBy", "sortOrder"]);
     const filter = (0, pick_1.default)(req.query, [
         "searchTerm",
