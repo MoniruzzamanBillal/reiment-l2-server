@@ -247,7 +247,7 @@ const handleDuplicateProduct = (payload) => __awaiter(void 0, void 0, void 0, fu
 const getRelatedProducts = (categoryId) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.products.findMany({
         where: { categoryId },
-        take: 4,
+        take: 5,
     });
     return result;
 });

@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response, Router } from "express";
-import { shopController } from "./shop.controller";
-import validateUser from "../../middleware/validateUser";
 import { UserRole } from "@prisma/client";
+import { NextFunction, Request, Response, Router } from "express";
+import validateUser from "../../middleware/validateUser";
 import { upload } from "../../util/SendImageCloudinary";
+import { shopController } from "./shop.controller";
 
 const router = Router();
 
@@ -12,6 +12,9 @@ router.get(
   validateUser(UserRole.ADMIN),
   shopController.getAllShopData
 );
+
+// ! for getting all shop data (public route )
+router.get("/all-shop", shopController.getAllPublicShopData);
 
 // ! for getting vendor shop data
 router.get(

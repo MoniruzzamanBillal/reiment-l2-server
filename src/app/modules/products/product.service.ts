@@ -302,8 +302,9 @@ const handleDuplicateProduct = async (payload: TShop) => {
 const getRelatedProducts = async (categoryId: string) => {
   const result = await prisma.products.findMany({
     where: { categoryId },
-    take: 4,
+    take: 5,
   });
+
   return result;
 };
 

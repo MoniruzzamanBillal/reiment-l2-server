@@ -1,9 +1,9 @@
-import { NextFunction, Request, Response, Router } from "express";
-import validateUser from "../../middleware/validateUser";
 import { UserRole } from "@prisma/client";
-import { productController } from "./product.controller";
-import { upload } from "../../util/SendImageCloudinary";
+import { NextFunction, Request, Response, Router } from "express";
 import validateRequest from "../../middleware/validateRequest";
+import validateUser from "../../middleware/validateUser";
+import { upload } from "../../util/SendImageCloudinary";
+import { productController } from "./product.controller";
 import { productValidations } from "./product.validation";
 
 const router = Router();

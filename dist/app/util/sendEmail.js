@@ -18,7 +18,7 @@ const sendEmail = (resetPasswordLink, receiverMail) => __awaiter(void 0, void 0,
     const transporter = nodemailer_1.default.createTransport({
         host: "smtp.gmail.com",
         port: 587,
-        secure: false, // Use `true` for port 465, `false` for all other ports
+        secure: false,
         auth: {
             user: "mdmoniruzzamanbillal2@gmail.com",
             pass: "ilmf eeqw agtp mibf",

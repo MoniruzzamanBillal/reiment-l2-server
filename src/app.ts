@@ -1,11 +1,11 @@
-import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
+import express, { Application, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 
-import globalErrorHandler from "./app/middleware/globalErrorHandler";
-import { MainRouter } from "./app/router";
 import cookieParser from "cookie-parser";
 import httpStatus from "http-status";
+import globalErrorHandler from "./app/middleware/globalErrorHandler";
+import { MainRouter } from "./app/router";
 
 const app: Application = express();
 
@@ -16,7 +16,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://reiment-l2-client.vercel.app",
-      "https://reimentl2.vercel.app/",
+      "https://reimentl2.vercel.app",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],

@@ -1,18 +1,18 @@
 import { Router } from "express";
-import { testRouter } from "../modules/boilerModule/test.route";
-import { userRouter } from "../modules/user/user.route";
-import { authRouter } from "../modules/auth/auth.router";
+import { addressRouter } from "../modules/address/address.route";
 import { adminRouter } from "../modules/admin/admin.route";
-import { categoryRouter } from "../modules/category/category.route";
-import { shopRouter } from "../modules/shop/shop.route";
-import { productRouter } from "../modules/products/product.route";
+import { authRouter } from "../modules/auth/auth.router";
+import { testRouter } from "../modules/boilerModule/test.route";
 import { cartRouter } from "../modules/cart/cart.route";
+import { categoryRouter } from "../modules/category/category.route";
+import { couponRouter } from "../modules/coupon/coupon.route";
+import { followerRouter } from "../modules/follower/follower.route";
 import { orderRouter } from "../modules/order/order.route";
 import { paymentRouter } from "../modules/payment/payment.route";
-import { addressRouter } from "../modules/address/address.route";
+import { productRouter } from "../modules/products/product.route";
 import { reviewRouter } from "../modules/review/review.route";
-import { followerRouter } from "../modules/follower/follower.route";
-import { couponRouter } from "../modules/coupon/coupon.route";
+import { shopRouter } from "../modules/shop/shop.route";
+import { userRouter } from "../modules/user/user.route";
 
 const router = Router();
 

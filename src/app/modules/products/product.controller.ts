@@ -1,8 +1,8 @@
 import httpStatus from "http-status";
 import catchAsync from "../../util/catchAsync";
+import pick from "../../util/pick";
 import sendResponse from "../../util/sendResponse";
 import { productServices } from "./product.service";
-import pick from "../../util/pick";
 
 // ! for crating a shop
 const addProduct = catchAsync(async (req, res) => {
@@ -89,7 +89,7 @@ const getFlashSaleProduct = catchAsync(async (req, res) => {
 
 // ! get recent products
 const getRecentProducts = catchAsync(async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const result = await productServices.getRecentProducts(req.body);
 
   sendResponse(res, {

@@ -47,6 +47,17 @@ const getAllShopData = catchAsync(async (req, res) => {
     data: result,
   });
 });
+// ! for getting all shop data (public route )
+const getAllPublicShopData = catchAsync(async (req, res) => {
+  const result = await shopServices.getAllPublicShopData();
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Shop Data retrived successfully!!!",
+    data: result,
+  });
+});
 
 // ! for getting vendor shop
 const getVendorShop = catchAsync(async (req, res) => {
@@ -79,4 +90,5 @@ export const shopController = {
   getAllShopData,
   getVendorShop,
   getSingleShop,
+  getAllPublicShopData,
 };

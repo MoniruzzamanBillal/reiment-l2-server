@@ -1,8 +1,8 @@
 import { ShopStatus, UserRole } from "@prisma/client";
-import prisma from "../../util/prisma";
-import { TShop } from "./shop.interface";
 import { IFile } from "../../interface/file";
+import prisma from "../../util/prisma";
 import { SendImageCloudinary } from "../../util/SendImageCloudinary";
+import { TShop } from "./shop.interface";
 
 // ! for crating a shop
 const crateShop = async (
@@ -116,6 +116,25 @@ const getAllShopData = async () => {
   return result;
 };
 
+// ! for getting all shop data (public route )
+const getAllPublicShopData = async () => {
+  const result = await prisma.shop.findMany({
+    where: { status: "ACTIVE" },
+    include: {
+      vendor: {
+        select: {
+          username: true,
+          email: true,
+          profileImg: true,
+        },
+      },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  return result;
+};
+
 // ! for getting user shop
 const getVendorShop = async (userId: string) => {
   const result = await prisma.shop.findUnique({
@@ -150,4 +169,5 @@ export const shopServices = {
   getAllShopData,
   getVendorShop,
   getSingleShop,
+  getAllPublicShopData,
 };

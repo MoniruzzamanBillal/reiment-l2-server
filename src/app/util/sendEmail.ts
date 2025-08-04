@@ -1,5 +1,4 @@
 import nodemailer from "nodemailer";
-import config from "../config";
 
 export const sendEmail = async (
   resetPasswordLink: string,
@@ -8,7 +7,7 @@ export const sendEmail = async (
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
-    secure: false, // Use `true` for port 465, `false` for all other ports
+    secure: false,
     auth: {
       user: "mdmoniruzzamanbillal2@gmail.com",
       pass: "ilmf eeqw agtp mibf",
