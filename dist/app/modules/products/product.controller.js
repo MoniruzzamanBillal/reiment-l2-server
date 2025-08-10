@@ -15,9 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.productController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../util/catchAsync"));
+const pick_1 = __importDefault(require("../../util/pick"));
 const sendResponse_1 = __importDefault(require("../../util/sendResponse"));
 const product_service_1 = require("./product.service");
-const pick_1 = __importDefault(require("../../util/pick"));
 // ! for crating a shop
 const addProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield product_service_1.productServices.addProduct(req.body, req.file);
@@ -89,7 +89,7 @@ const getFlashSaleProduct = (0, catchAsync_1.default)((req, res) => __awaiter(vo
 }));
 // ! get recent products
 const getRecentProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.body);
+    // console.log(req.body);
     const result = yield product_service_1.productServices.getRecentProducts(req.body);
     (0, sendResponse_1.default)(res, {
         status: http_status_1.default.OK,

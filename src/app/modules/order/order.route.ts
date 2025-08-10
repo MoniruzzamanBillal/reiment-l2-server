@@ -1,6 +1,6 @@
+import { UserRole } from "@prisma/client";
 import { Router } from "express";
 import validateUser from "../../middleware/validateUser";
-import { UserRole } from "@prisma/client";
 import { orderController } from "./order.controller";
 
 const router = Router();

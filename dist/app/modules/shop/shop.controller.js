@@ -49,6 +49,16 @@ const getAllShopData = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+// ! for getting all shop data (public route )
+const getAllPublicShopData = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield shop_service_1.shopServices.getAllPublicShopData();
+    (0, sendResponse_1.default)(res, {
+        status: http_status_1.default.OK,
+        success: true,
+        message: "Shop Data retrived successfully!!!",
+        data: result,
+    });
+}));
 // ! for getting vendor shop
 const getVendorShop = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -78,4 +88,5 @@ exports.shopController = {
     getAllShopData,
     getVendorShop,
     getSingleShop,
+    getAllPublicShopData,
 };

@@ -11,7 +11,7 @@ const orderItem = catchAsync(async (req, res) => {
     status: httpStatus.OK,
     success: true,
     message: "Item  ordered successfully!!!",
-    data: result?.payment_url,
+    data: result,
   });
 });
 

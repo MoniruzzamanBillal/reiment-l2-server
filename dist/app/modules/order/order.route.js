@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderRouter = void 0;
+const client_1 = require("@prisma/client");
 const express_1 = require("express");
 const validateUser_1 = __importDefault(require("../../middleware/validateUser"));
-const client_1 = require("@prisma/client");
 const order_controller_1 = require("./order.controller");
 const router = (0, express_1.Router)();
 // ! for getting all transaction data

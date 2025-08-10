@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productRouter = void 0;
-const express_1 = require("express");
-const validateUser_1 = __importDefault(require("../../middleware/validateUser"));
 const client_1 = require("@prisma/client");
-const product_controller_1 = require("./product.controller");
-const SendImageCloudinary_1 = require("../../util/SendImageCloudinary");
+const express_1 = require("express");
 const validateRequest_1 = __importDefault(require("../../middleware/validateRequest"));
+const validateUser_1 = __importDefault(require("../../middleware/validateUser"));
+const SendImageCloudinary_1 = require("../../util/SendImageCloudinary");
+const product_controller_1 = require("./product.controller");
 const product_validation_1 = require("./product.validation");
 const router = (0, express_1.Router)();
 // ! for getting all product

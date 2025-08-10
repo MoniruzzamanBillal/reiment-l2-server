@@ -19,7 +19,10 @@ exports.default = {
     nodemailer_sender: process.env.NODEMAILER_SENDER,
     nodemailer_password: process.env.NODEMAILER_Password,
     STORE_ID: process.env.STORE_ID,
-    SIGNATURE_KEY: process.env.SIGNATURE_KEY,
-    PAYMENT_URL: process.env.PAYMENT_URL,
-    PAYMENT_Check_URL: process.env.PAYMENT_Check_URL,
+    STORE_PASSWORD: process.env.STORE_PASSWORD,
+    SUCCESS_URL: process.env.SUCCESS_URL,
+    FAIL_URL: process.env.FAIL_URL,
+    CANCEL_URL: process.env.CANCEL_URL,
+    SSL_PAYMENT_URL: process.env.SSL_PAYMENT_URL,
+    SSL_VALIDATION_URL: process.env.SSL_VALIDATION_URL,
 };

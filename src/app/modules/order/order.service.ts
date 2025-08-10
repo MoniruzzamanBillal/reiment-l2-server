@@ -1,8 +1,8 @@
+import { OrderStatus } from "@prisma/client";
 import httpStatus from "http-status";
 import AppError from "../../Error/AppError";
 import prisma from "../../util/prisma";
-import { initiatePayment } from "../payment/payment.util";
-import { OrderStatus } from "@prisma/client";
+import { initPayment } from "../payment/payment.util";
 
 // ! for ordering product
 const orderItem = async (
@@ -100,7 +100,9 @@ const orderItem = async (
       userId: userId,
     };
 
-    const transactionResult = await initiatePayment(tracsactionData);
+    const transactionResult = await initPayment(tracsactionData);
+
+    console.log(transactionResult);
 
     if (transactionResult?.tran_id) {
       throw new AppError(httpStatus.BAD_REQUEST, transactionResult?.tran_id);

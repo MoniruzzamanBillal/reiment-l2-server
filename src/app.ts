@@ -1,3 +1,4 @@
+import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
@@ -26,6 +27,7 @@ app.use(
 
 app.use(morgan("dev"));
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // ! rouutes
 app.use("/api", MainRouter);

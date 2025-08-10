@@ -25,7 +25,7 @@ const orderItem = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
         status: http_status_1.default.OK,
         success: true,
         message: "Item  ordered successfully!!!",
-        data: result === null || result === void 0 ? void 0 : result.payment_url,
+        data: result,
     });
 }));
 // ! for getting order

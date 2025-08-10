@@ -1,25 +1,31 @@
 import { OrderStatus } from "@prisma/client";
+import httpStatus from "http-status";
+import AppError from "../../Error/AppError";
 import prisma from "../../util/prisma";
-import { verifyPay } from "./payment.util";
 
-const verifyPayment = async (transactionId: string) => {
-  const verifyResult = await verifyPay(transactionId);
+// ! after successfully payment
+const successfullyPayment = async (payload: any) => {
+  const { tran_id, status } = payload;
 
-  if (verifyResult && verifyResult?.pay_status === "Successful") {
-    await prisma.order.update({
-      where: {
-        trxnNumber: transactionId,
-      },
-      data: {
-        status: OrderStatus.COMPLETED,
-      },
-    });
+  if (status !== "VALID") {
+    throw new AppError(httpStatus.BAD_REQUEST, "Payment Failed !!!");
   }
 
-  return verifyResult;
+  const result = await prisma.order.update({
+    where: {
+      trxnNumber: tran_id,
+    },
+    data: {
+      status: OrderStatus.COMPLETED,
+    },
+  });
+
+  return result;
+
+  //
 };
 
 //
 export const paymentServices = {
-  verifyPayment,
+  successfullyPayment,
 };

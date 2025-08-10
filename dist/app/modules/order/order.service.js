@@ -13,11 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderServices = void 0;
+const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../Error/AppError"));
 const prisma_1 = __importDefault(require("../../util/prisma"));
 const payment_util_1 = require("../payment/payment.util");
-const client_1 = require("@prisma/client");
 // ! for ordering product
 const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const { cartId, cuponId } = payload;
@@ -92,7 +92,8 @@ const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
             customerEmail: userData === null || userData === void 0 ? void 0 : userData.email,
             userId: userId,
         };
-        const transactionResult = yield (0, payment_util_1.initiatePayment)(tracsactionData);
+        const transactionResult = yield (0, payment_util_1.initPayment)(tracsactionData);
+        console.log(transactionResult);
         if (transactionResult === null || transactionResult === void 0 ? void 0 : transactionResult.tran_id) {
             throw new AppError_1.default(http_status_1.default.BAD_REQUEST, transactionResult === null || transactionResult === void 0 ? void 0 : transactionResult.tran_id);
         }

@@ -14,23 +14,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.paymentServices = void 0;
 const client_1 = require("@prisma/client");
+const http_status_1 = __importDefault(require("http-status"));
+const AppError_1 = __importDefault(require("../../Error/AppError"));
 const prisma_1 = __importDefault(require("../../util/prisma"));
-const payment_util_1 = require("./payment.util");
-const verifyPayment = (transactionId) => __awaiter(void 0, void 0, void 0, function* () {
-    const verifyResult = yield (0, payment_util_1.verifyPay)(transactionId);
-    if (verifyResult && (verifyResult === null || verifyResult === void 0 ? void 0 : verifyResult.pay_status) === "Successful") {
-        yield prisma_1.default.order.update({
-            where: {
-                trxnNumber: transactionId,
-            },
-            data: {
-                status: client_1.OrderStatus.COMPLETED,
-            },
-        });
+// ! after successfully payment
+const successfullyPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const { tran_id, status } = payload;
+    if (status !== "VALID") {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Payment Failed !!!");
     }
-    return verifyResult;
+    const result = yield prisma_1.default.order.update({
+        where: {
+            trxnNumber: tran_id,
+        },
+        data: {
+            status: client_1.OrderStatus.COMPLETED,
+        },
+    });
+    return result;
+    //
 });
 //
 exports.paymentServices = {
-    verifyPayment,
+    successfullyPayment,
 };

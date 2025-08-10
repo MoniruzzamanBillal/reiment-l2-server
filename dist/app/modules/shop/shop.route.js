@@ -4,14 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shopRouter = void 0;
-const express_1 = require("express");
-const shop_controller_1 = require("./shop.controller");
-const validateUser_1 = __importDefault(require("../../middleware/validateUser"));
 const client_1 = require("@prisma/client");
+const express_1 = require("express");
+const validateUser_1 = __importDefault(require("../../middleware/validateUser"));
 const SendImageCloudinary_1 = require("../../util/SendImageCloudinary");
+const shop_controller_1 = require("./shop.controller");
 const router = (0, express_1.Router)();
 // ! for getting all shop data
 router.get("/all-shop-data", (0, validateUser_1.default)(client_1.UserRole.ADMIN), shop_controller_1.shopController.getAllShopData);
+// ! for getting all shop data (public route )
+router.get("/all-shop", shop_controller_1.shopController.getAllPublicShopData);
 // ! for getting vendor shop data
 router.get("/vendor-shop", (0, validateUser_1.default)(client_1.UserRole.VENDOR), shop_controller_1.shopController.getVendorShop);
 // ! for crating a shop

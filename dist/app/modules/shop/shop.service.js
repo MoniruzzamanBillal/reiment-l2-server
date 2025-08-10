@@ -97,6 +97,23 @@ const getAllShopData = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     return result;
 });
+// ! for getting all shop data (public route )
+const getAllPublicShopData = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.shop.findMany({
+        where: { status: "ACTIVE" },
+        include: {
+            vendor: {
+                select: {
+                    username: true,
+                    email: true,
+                    profileImg: true,
+                },
+            },
+        },
+        orderBy: { updatedAt: "desc" },
+    });
+    return result;
+});
 // ! for getting user shop
 const getVendorShop = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.shop.findUnique({
@@ -127,4 +144,5 @@ exports.shopServices = {
     getAllShopData,
     getVendorShop,
     getSingleShop,
+    getAllPublicShopData,
 };
