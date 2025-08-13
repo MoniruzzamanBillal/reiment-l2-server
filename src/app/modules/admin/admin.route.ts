@@ -1,9 +1,16 @@
+import { UserRole } from "@prisma/client";
 import { Router } from "express";
 import validateUser from "../../middleware/validateUser";
-import { UserRole } from "@prisma/client";
 import { adminController } from "./admin.controller";
 
 const router = Router();
+
+// ! for getting admin statistics
+router.get(
+  "/stats",
+  validateUser(UserRole.ADMIN),
+  adminController.getAdminStatistics
+);
 
 // ! delete a user
 router.patch(
