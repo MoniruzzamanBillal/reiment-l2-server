@@ -17,6 +17,16 @@ const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../util/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../util/sendResponse"));
 const admin_service_1 = require("./admin.service");
+// ! for getting admin statistics
+const getAdminStatistics = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield admin_service_1.adminService.getAdminStatistics();
+    (0, sendResponse_1.default)(res, {
+        status: http_status_1.default.OK,
+        success: true,
+        message: "Stats retrived successgully",
+        data: result,
+    });
+}));
 // ! for deleting user
 const deleteUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield admin_service_1.adminService.deleteUser(req.params.id);
@@ -49,4 +59,5 @@ exports.adminController = {
     deleteUser,
     blockUser,
     blockShop,
+    getAdminStatistics,
 };

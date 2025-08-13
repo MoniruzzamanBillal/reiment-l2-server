@@ -15,6 +15,54 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.adminService = void 0;
 const client_1 = require("@prisma/client");
 const prisma_1 = __importDefault(require("../../util/prisma"));
+const admin_function_1 = require("./admin.function");
+// ! for getting admin statistics
+const getAdminStatistics = () => __awaiter(void 0, void 0, void 0, function* () {
+    // Count total users
+    const totalUsers = yield prisma_1.default.user.count({
+        where: { isDelated: false },
+    });
+    // Count active vendors
+    const activeVendors = yield prisma_1.default.user.count({
+        where: {
+            role: client_1.UserRole.VENDOR,
+            status: client_1.UserStatus.ACTIVE,
+            isDelated: false,
+        },
+    });
+    // Count blocked vendors
+    const blockedVendors = yield prisma_1.default.user.count({
+        where: {
+            role: client_1.UserRole.VENDOR,
+            status: client_1.UserStatus.BLOCKED,
+            isDelated: false,
+        },
+    });
+    // Count total orders
+    const totalOrders = yield prisma_1.default.order.count({
+        where: { isDelated: false },
+    });
+    // Calculate total revenue (sum of order totalPrice for non-deleted orders)
+    const revenueDataPrice = yield prisma_1.default.order.aggregate({
+        _sum: { totalPrice: true },
+        where: { isDelated: false },
+    });
+    const totalRevenue = (revenueDataPrice === null || revenueDataPrice === void 0 ? void 0 : revenueDataPrice._sum.totalPrice) || 0;
+    const statsData = [
+        { value: totalUsers, title: "Total Users" },
+        { value: activeVendors, title: "Active Vendors" },
+        { value: blockedVendors, title: "Blocked Vendors" },
+        { value: totalOrders, title: "Total Orders" },
+        { value: totalRevenue, title: "Total Revenue" },
+    ];
+    const revenueDatas = yield (0, admin_function_1.getRevenueData)();
+    const categoryDataPercentage = yield (0, admin_function_1.getCategoryProductPercentageFunc)();
+    return {
+        statsData,
+        revenueDatas,
+        categoryDataPercentage,
+    };
+});
 // ! for deleting a user
 const deleteUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.default.user.findUniqueOrThrow({
@@ -55,4 +103,5 @@ exports.adminService = {
     deleteUser,
     blockUser,
     blockVendorShop,
+    getAdminStatistics,
 };

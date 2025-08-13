@@ -44,11 +44,11 @@ const getAdminStatistics = async () => {
   const totalRevenue = revenueDataPrice?._sum.totalPrice || 0;
 
   const statsData = [
-    { totalUsers },
-    { activeVendors },
-    { blockedVendors },
-    { totalOrders },
-    { totalRevenue },
+    { value: totalUsers, title: "Total Users" },
+    { value: activeVendors, title: "Active Vendors" },
+    { value: blockedVendors, title: "Blocked Vendors" },
+    { value: totalOrders, title: "Total Orders" },
+    { value: totalRevenue, title: "Total Revenue" },
   ];
 
   const revenueDatas = await getRevenueData();
