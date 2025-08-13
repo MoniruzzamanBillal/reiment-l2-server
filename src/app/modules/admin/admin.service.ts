@@ -32,12 +32,12 @@ const getAdminStatistics = async () => {
   });
 
   // Calculate total revenue (sum of order totalPrice for non-deleted orders)
-  const revenueData = await prisma.order.aggregate({
+  const revenueDataPrice = await prisma.order.aggregate({
     _sum: { totalPrice: true },
     where: { isDelated: false },
   });
 
-  const totalRevenue = revenueData._sum.totalPrice || 0;
+  const totalRevenue = revenueDataPrice?._sum.totalPrice || 0;
 
   const statsData = [
     { totalUsers },
@@ -47,8 +47,52 @@ const getAdminStatistics = async () => {
     { totalRevenue },
   ];
 
+  const revenueData = await prisma.order.groupBy({
+    by: ["createdAt"],
+    _sum: { totalPrice: true },
+    _count: { id: true },
+    where: { isDelated: false },
+  });
+
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const monthlyStats: { [key: string]: { revenue: number; orders: number } } =
+    {};
+
+  revenueData?.forEach((item) => {
+    const monthIndex = new Date(item?.createdAt).getMonth();
+    const monthName = monthNames[monthIndex];
+
+    if (!monthlyStats[monthName]) {
+      monthlyStats[monthName] = { revenue: 0, orders: 0 };
+    }
+
+    monthlyStats[monthName].revenue += item?._sum?.totalPrice || 0;
+    monthlyStats[monthName].orders += item?._count?.id || 0;
+  });
+
+  const revenueDatas = Object.entries(monthlyStats)?.map(([month, value]) => ({
+    month,
+    revenue: value?.revenue,
+    orders: value?.orders,
+  }));
+
   return {
     statsData,
+    revenueDatas,
   };
 };
 
