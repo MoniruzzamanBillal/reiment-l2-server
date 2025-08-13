@@ -1,5 +1,9 @@
 import { ShopStatus, UserRole, UserStatus } from "@prisma/client";
 import prisma from "../../util/prisma";
+import {
+  getCategoryProductPercentageFunc,
+  getRevenueData,
+} from "./admin.function";
 
 // ! for getting admin statistics
 const getAdminStatistics = async () => {
@@ -47,52 +51,14 @@ const getAdminStatistics = async () => {
     { totalRevenue },
   ];
 
-  const revenueData = await prisma.order.groupBy({
-    by: ["createdAt"],
-    _sum: { totalPrice: true },
-    _count: { id: true },
-    where: { isDelated: false },
-  });
+  const revenueDatas = await getRevenueData();
 
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
-  const monthlyStats: { [key: string]: { revenue: number; orders: number } } =
-    {};
-
-  revenueData?.forEach((item) => {
-    const monthIndex = new Date(item?.createdAt).getMonth();
-    const monthName = monthNames[monthIndex];
-
-    if (!monthlyStats[monthName]) {
-      monthlyStats[monthName] = { revenue: 0, orders: 0 };
-    }
-
-    monthlyStats[monthName].revenue += item?._sum?.totalPrice || 0;
-    monthlyStats[monthName].orders += item?._count?.id || 0;
-  });
-
-  const revenueDatas = Object.entries(monthlyStats)?.map(([month, value]) => ({
-    month,
-    revenue: value?.revenue,
-    orders: value?.orders,
-  }));
+  const categoryDataPercentage = await getCategoryProductPercentageFunc();
 
   return {
     statsData,
     revenueDatas,
+    categoryDataPercentage,
   };
 };
 
