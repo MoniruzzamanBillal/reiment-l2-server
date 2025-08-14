@@ -1,12 +1,15 @@
+import { UserRole } from "@prisma/client";
 import { Router } from "express";
 import validateUser from "../../middleware/validateUser";
-import { UserRole } from "@prisma/client";
 import { reviewController } from "./review.controller";
 
 const router = Router();
 
 // ! for getting all review
 router.get("/all-review", reviewController.getAllReview);
+
+// ! for getting recent 3 reviews
+router.get("/recent-review", reviewController.getRecentReview);
 
 // ! for checking eligibility for review
 router.get(

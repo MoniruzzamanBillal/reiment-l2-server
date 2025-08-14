@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reviewServices = void 0;
+const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../Error/AppError"));
 const prisma_1 = __importDefault(require("../../util/prisma"));
-const client_1 = require("@prisma/client");
 // ! give review
 const createReview = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const orderItemData = yield prisma_1.default.orderItem.findFirst({
@@ -113,10 +113,36 @@ const getAllReview = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     return result;
 });
+// ! for getting recent 3 reviews
+const getRecentReview = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.review.findMany({
+        where: { isDeleted: false },
+        include: {
+            product: {
+                select: {
+                    id: true,
+                    name: true,
+                    price: true,
+                },
+            },
+            user: {
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                    profileImg: true,
+                },
+            },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+    });
+    return result;
+});
 // ! update review
 const updateReview = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { reviewId, comment } = payload;
-    console.log(payload);
+    // console.log(payload);
     const reviewData = yield prisma_1.default.review.findUnique({
         where: {
             id: reviewId,
@@ -138,4 +164,5 @@ exports.reviewServices = {
     getVendorProductReviews,
     getAllReview,
     updateReview,
+    getRecentReview,
 };

@@ -4,13 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reviewRouter = void 0;
+const client_1 = require("@prisma/client");
 const express_1 = require("express");
 const validateUser_1 = __importDefault(require("../../middleware/validateUser"));
-const client_1 = require("@prisma/client");
 const review_controller_1 = require("./review.controller");
 const router = (0, express_1.Router)();
 // ! for getting all review
 router.get("/all-review", review_controller_1.reviewController.getAllReview);
+// ! for getting recent 3 reviews
+router.get("/recent-review", review_controller_1.reviewController.getRecentReview);
 // ! for checking eligibility for review
 router.get("/check-eligible-for-review/:id", (0, validateUser_1.default)(client_1.UserRole.CUSTOMER), review_controller_1.reviewController.checkEligibleForReview);
 // ! for getting vendor prosuct review

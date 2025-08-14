@@ -60,6 +60,16 @@ const getAllReview = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         data: result,
     });
 }));
+// ! for getting recent 3 reviews
+const getRecentReview = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield review_services_1.reviewServices.getRecentReview();
+    (0, sendResponse_1.default)(res, {
+        status: http_status_1.default.CREATED,
+        success: true,
+        message: "Review retrived successfully !!! ",
+        data: result,
+    });
+}));
 // ! for updating review
 const updateReview = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield review_services_1.reviewServices.updateReview(req.body);
@@ -77,4 +87,5 @@ exports.reviewController = {
     getVendorProductReviews,
     getAllReview,
     updateReview,
+    getRecentReview,
 };

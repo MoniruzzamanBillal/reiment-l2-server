@@ -54,6 +54,18 @@ const getAllReview = catchAsync(async (req, res) => {
   });
 });
 
+// ! for getting recent 3 reviews
+const getRecentReview = catchAsync(async (req, res) => {
+  const result = await reviewServices.getRecentReview();
+
+  sendResponse(res, {
+    status: httpStatus.CREATED,
+    success: true,
+    message: "Review retrived successfully !!! ",
+    data: result,
+  });
+});
+
 // ! for updating review
 const updateReview = catchAsync(async (req, res) => {
   const result = await reviewServices.updateReview(req.body);
@@ -73,4 +85,5 @@ export const reviewController = {
   getVendorProductReviews,
   getAllReview,
   updateReview,
+  getRecentReview,
 };

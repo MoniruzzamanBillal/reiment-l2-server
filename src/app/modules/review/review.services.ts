@@ -1,8 +1,8 @@
+import { OrderStatus } from "@prisma/client";
 import httpStatus from "http-status";
 import AppError from "../../Error/AppError";
 import prisma from "../../util/prisma";
 import { TAddReview } from "./review.interface";
-import { OrderStatus } from "@prisma/client";
 
 // ! give review
 const createReview = async (payload: TAddReview, userId: string) => {
@@ -125,11 +125,39 @@ const getAllReview = async () => {
   return result;
 };
 
+// ! for getting recent 3 reviews
+const getRecentReview = async () => {
+  const result = await prisma.review.findMany({
+    where: { isDeleted: false },
+    include: {
+      product: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          profileImg: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+
+  return result;
+};
+
 // ! update review
 const updateReview = async (payload: { reviewId: string; comment: string }) => {
   const { reviewId, comment } = payload;
 
-  console.log(payload);
+  // console.log(payload);
 
   const reviewData = await prisma.review.findUnique({
     where: {
@@ -156,4 +184,5 @@ export const reviewServices = {
   getVendorProductReviews,
   getAllReview,
   updateReview,
+  getRecentReview,
 };
