@@ -13,6 +13,7 @@ import { productRouter } from "../modules/products/product.route";
 import { reviewRouter } from "../modules/review/review.route";
 import { shopRouter } from "../modules/shop/shop.route";
 import { userRouter } from "../modules/user/user.route";
+import { aiRouter } from "../modules/ai/ai.route";
 
 const router = Router();
 
@@ -72,6 +73,10 @@ const routeArray = [
   {
     path: "/coupon",
     route: couponRouter,
+  },
+  {
+    path: "/ai",
+    route: aiRouter,
   },
 ];
 
