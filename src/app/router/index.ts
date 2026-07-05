@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { addressRouter } from "../modules/address/address.route";
 import { adminRouter } from "../modules/admin/admin.route";
+import { aiRouter } from "../modules/ai/ai.route";
 import { authRouter } from "../modules/auth/auth.router";
 import { testRouter } from "../modules/boilerModule/test.route";
 import { cartRouter } from "../modules/cart/cart.route";
@@ -72,6 +73,10 @@ const routeArray = [
   {
     path: "/coupon",
     route: couponRouter,
+  },
+  {
+    path: "/ai",
+    route: aiRouter,
   },
 ];
 
