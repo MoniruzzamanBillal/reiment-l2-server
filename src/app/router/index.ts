@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { addressRouter } from "../modules/address/address.route";
 import { adminRouter } from "../modules/admin/admin.route";
+import { aiRouter } from "../modules/ai/ai.route";
 import { authRouter } from "../modules/auth/auth.router";
 import { testRouter } from "../modules/boilerModule/test.route";
 import { cartRouter } from "../modules/cart/cart.route";
@@ -13,7 +14,6 @@ import { productRouter } from "../modules/products/product.route";
 import { reviewRouter } from "../modules/review/review.route";
 import { shopRouter } from "../modules/shop/shop.route";
 import { userRouter } from "../modules/user/user.route";
-import { aiRouter } from "../modules/ai/ai.route";
 
 const router = Router();
 
