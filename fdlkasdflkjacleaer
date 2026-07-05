@@ -1,0 +1,81 @@
+* [33m249dd2b2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m  get recent reviw service added
+* [33ma50ad340[m  admin stats : stats data retrivve
+* [33mb5be01a2[m  admin stats : category percentage
+* [33m4e0ee525[m  admin stats : revenue data retrive
+* [33me9456d07[m  admin stats : stats data
+* [33m500f3dc0[m  payment method problem fixed : update the env variable
+* [33mb064076b[m  get all shop data , public route
+* [33m2096d95c[m  all product : new meta data added
+* [33m37fc925e[m  fetch all product with limit and skip
+* [33m461e0ea2[m  new domain config
+* [33mf89f9d4b[m  reset password update ,
+* [33m18091e8c[m  jwt error fixed
+* [33m8d22ff5c[m  login function hasing package changr
+* [33m31f7d621[m  database link change , register function hasing package change
+* [33mb46ac2ac[m  u
+* [33me4be3352[m  deploy 2
+* [33mbc093036[m  coupon
+* [33m301ccac2[m  admmin block
+* [33m14346f30[m  reset password function added
+* [33m90102fae[m  reset password mail send function done
+* [33m369e36e5[m  comment update done
+* [33m04167f94[m  get all transaction done
+* [33m0d66a7c9[m  category update function done
+* [33m20ef03b7[m  category data delete function done
+* [33m6e6b1395[m  vendor unblock function added
+* [33m040343e4[m  vendor block finction done
+* [33m335e9c54[m  user unblock function added
+* [33m172772c3[m  user delete function added
+* [33m8cc476ab[m product get function modified
+* [33m2e53972e[m  get vendor shop product review
+* [33m72314bf5[m  get user following data done
+* [33mdab82b00[m  coupon : get werong coupon bug fix
+* [33m94c53acf[m  user follow shop filter done
+* [33m1814da05[m  price range filter added
+* [33m944d89fe[m  category filter done
+* [33mb06e1126[m  search term condition filter added
+* [33m214665aa[m  coupon function added
+* [33m7589579c[m  coupon retirvation done
+* [33mc50bbbe3[m  coupon added
+* [33m9664e28a[m  recent product function added
+* [33mb475ee04[m  follow unfollow shop done
+* [33m8dcdc033[m  product review function added
+* [33m0c6050e3[m  realted product done
+* [33m9556c612[m  flash sale product functin done
+* [33m39026d9e[m  product duplicate function added
+* [33m58fead7e[m  product delete function added
+* [33mafe06c2a[m  update profile function added
+* [33me947b0a2[m  logged in user data get function done
+* [33mc24cac98[m  cart increament decreament function added
+* [33md3a5b2ab[m category image added
+* [33m7c49f7f9[m  all product data function added
+* [33m45261f9a[m  get single shop data function added
+* [33md6f415ed[m  sinfle product get function added
+* [33ma2b9e071[m  vendor product retrived successfully
+* [33mb3292b51[m  vendor shop getting function added
+* [33ma5d00e90[m  get all shop data function added
+* [33m254fef53[m  adding review added
+* [33m142a8b65[m  address updation and deletation done
+* [33mfff4d38d[m  get user address function added
+* [33me0372d49[m  address add functioon added
+* [33md54f0d9d[m  get user order added
+* [33mf6613b35[m  order complete done , payment integration done
+* [33m5296beb4[m  order item complete
+* [33mddc33878[m  order module added
+* [33m3d50a82e[m  delete cart data funciton fix --> use transaction to delete
+* [33mbcac9942[m  cart item delete fucnitonality added
+* [33m2ac73c69[m  get cart item - modified
+* [33m6c60fac4[m  cart - add to cart function , replace cart item , get cart item funcion added
+* [33m068ba063[m  product add to cart functionality added
+* [33mc3da24e7[m  cart module structure added
+* [33m231ae7b8[m  product delete function added
+* [33m8d375c15[m  product update function added
+* [33m0b16ac0c[m  product adding functionality added
+* [33mb80b8551[m  shop updatate function added
+* [33m1b9a0921[m  shop cration function added
+* [33m63451d9f[m  category module added : crud functionality added
+* [33m2469505b[m  admin : user blocked finctionality adde d
+* [33m13b9838b[m  admin : user delete functionality added
+* [33m1a8b1a0c[m  login done
+* [33me0bf8409[m  user cration done
+* [33m41063494[m  set up

@@ -15,6 +15,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
+      "http://localhost:3000",
       "http://localhost:5173",
       "https://reiment-l2-client.vercel.app",
       "https://reimentl2.vercel.app",
