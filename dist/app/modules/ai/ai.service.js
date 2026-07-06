@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.aiServices = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../Error/AppError"));
-const prisma_1 = __importDefault(require("../../util/prisma"));
 const openRouterClient_1 = require("../../util/openRouterClient");
+const prisma_1 = __importDefault(require("../../util/prisma"));
 const product_constants_1 = require("../products/product.constants");
 // ! models sometimes wrap json in prose/markdown despite instructions - pull the object out
 const extractJson = (text) => {
@@ -43,7 +43,10 @@ const generateProductDescription = (payload) => __awaiter(void 0, void 0, void 0
             content: `Name: ${payload.name}\nCategory: ${categoryData.name}\nKeywords: ${(_a = payload.keywords) !== null && _a !== void 0 ? _a : "N/A"}\nPrice: ${(_b = payload.price) !== null && _b !== void 0 ? _b : "N/A"}`,
         },
     ];
-    const raw = yield (0, openRouterClient_1.askOpenRouter)(messages, { jsonMode: true, temperature: 0.8 });
+    const raw = yield (0, openRouterClient_1.askOpenRouter)(messages, {
+        jsonMode: true,
+        temperature: 0.8,
+    });
     try {
         const parsed = JSON.parse(extractJson(raw));
         if (!(parsed === null || parsed === void 0 ? void 0 : parsed.title) || !(parsed === null || parsed === void 0 ? void 0 : parsed.description)) {
@@ -131,7 +134,10 @@ Rules:
         { role: "user", content: query },
     ];
     try {
-        const raw = yield (0, openRouterClient_1.askOpenRouter)(messages, { jsonMode: true, temperature: 0.2 });
+        const raw = yield (0, openRouterClient_1.askOpenRouter)(messages, {
+            jsonMode: true,
+            temperature: 0.2,
+        });
         const parsed = JSON.parse(extractJson(raw));
         const filter = {};
         if (typeof (parsed === null || parsed === void 0 ? void 0 : parsed.searchTerm) === "string" && parsed.searchTerm.trim()) {
