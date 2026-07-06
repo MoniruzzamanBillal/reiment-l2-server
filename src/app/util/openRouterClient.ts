@@ -26,16 +26,19 @@ const openRouterClient = new OpenAI({
 
 // ! free models to try in order - if one is rate limited/down, fall back to the next
 const FREE_MODELS = [
+  "nvidia/nemotron-3-ultra-550b-a55b:free",
   "nvidia/nemotron-3-nano-30b-a3b:free",
-  "meta-llama/llama-3.3-70b-instruct:free",
-  "deepseek/deepseek-chat-v3.1:free",
-  "qwen/qwen-2.5-72b-instruct:free",
+
+  "meta-llama/llama-3.2-3b-instruct:free",
+  // "deepseek/deepseek-chat-v3.1:free",
+
+  "qwen/qwen3-next-80b-a3b-instruct:free",
 ];
 
 // ! single choke point every ai feature talks through
 export const askOpenRouter = async (
   messages: TChatMessage[],
-  options?: TAskOptions
+  options?: TAskOptions,
 ): Promise<string> => {
   let lastError: unknown;
 
@@ -67,6 +70,6 @@ export const askOpenRouter = async (
 
   throw new AppError(
     httpStatus.SERVICE_UNAVAILABLE,
-    "AI service is busy right now, please try again shortly"
+    "AI service is busy right now, please try again shortly",
   );
 };

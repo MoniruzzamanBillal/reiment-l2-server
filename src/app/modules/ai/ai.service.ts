@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
 import AppError from "../../Error/AppError";
-import prisma from "../../util/prisma";
 import { askOpenRouter, TChatMessage } from "../../util/openRouterClient";
+import prisma from "../../util/prisma";
 import { productSearchableFields } from "../products/product.constants";
 import {
   TChatPayload,
@@ -19,7 +19,7 @@ const extractJson = (text: string) => {
 
 // ! for drafting a product title + description for a vendor
 const generateProductDescription = async (
-  payload: TGenerateDescriptionPayload
+  payload: TGenerateDescriptionPayload,
 ): Promise<TGenerateDescriptionResult> => {
   const categoryData = await prisma.categories.findUnique({
     where: { id: payload.categoryId },
@@ -44,7 +44,10 @@ const generateProductDescription = async (
     },
   ];
 
-  const raw = await askOpenRouter(messages, { jsonMode: true, temperature: 0.8 });
+  const raw = await askOpenRouter(messages, {
+    jsonMode: true,
+    temperature: 0.8,
+  });
 
   try {
     const parsed = JSON.parse(extractJson(raw));
@@ -57,13 +60,15 @@ const generateProductDescription = async (
   } catch {
     throw new AppError(
       httpStatus.SERVICE_UNAVAILABLE,
-      "AI returned an unexpected response, please try again"
+      "AI returned an unexpected response, please try again",
     );
   }
 };
 
 // ! for grounding + answering a customer chat message
-const chatWithAssistant = async (payload: TChatPayload): Promise<TChatResult> => {
+const chatWithAssistant = async (
+  payload: TChatPayload,
+): Promise<TChatResult> => {
   const keywords = payload.message
     .split(/\s+/)
     .filter((word) => word.length > 2)
@@ -72,7 +77,7 @@ const chatWithAssistant = async (payload: TChatPayload): Promise<TChatResult> =>
   const searchConditions = keywords.flatMap((word) =>
     productSearchableFields.map((field) => ({
       [field]: { contains: word, mode: "insensitive" as const },
-    }))
+    })),
   );
 
   const candidateProducts = await prisma.products.findMany({
@@ -90,7 +95,7 @@ const chatWithAssistant = async (payload: TChatPayload): Promise<TChatResult> =>
       (product) =>
         `${product.id} | ${product.name} | $${product.price}${
           product.discount ? ` (${product.discount}% off)` : ""
-        } | ${product.category.name}`
+        } | ${product.category.name}`,
     )
     .join("\n");
 
@@ -133,7 +138,9 @@ If you mentioned no products, output {"productIds": []}.`;
 };
 
 // ! for turning a natural language query into a structured product filter
-const parseSmartSearchQuery = async (query: string): Promise<TSmartSearchFilter> => {
+const parseSmartSearchQuery = async (
+  query: string,
+): Promise<TSmartSearchFilter> => {
   const categories = await prisma.categories.findMany({
     where: { isDelated: false },
     select: { id: true, name: true },
@@ -160,7 +167,10 @@ Rules:
   ];
 
   try {
-    const raw = await askOpenRouter(messages, { jsonMode: true, temperature: 0.2 });
+    const raw = await askOpenRouter(messages, {
+      jsonMode: true,
+      temperature: 0.2,
+    });
     const parsed = JSON.parse(extractJson(raw));
 
     const filter: TSmartSearchFilter = {};
