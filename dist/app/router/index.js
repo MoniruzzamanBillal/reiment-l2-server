@@ -4,6 +4,7 @@ exports.MainRouter = void 0;
 const express_1 = require("express");
 const address_route_1 = require("../modules/address/address.route");
 const admin_route_1 = require("../modules/admin/admin.route");
+const ai_route_1 = require("../modules/ai/ai.route");
 const auth_router_1 = require("../modules/auth/auth.router");
 const test_route_1 = require("../modules/boilerModule/test.route");
 const cart_route_1 = require("../modules/cart/cart.route");
@@ -73,6 +74,10 @@ const routeArray = [
     {
         path: "/coupon",
         route: coupon_route_1.couponRouter,
+    },
+    {
+        path: "/ai",
+        route: ai_route_1.aiRouter,
     },
 ];
 routeArray.forEach((item) => {

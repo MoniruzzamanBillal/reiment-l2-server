@@ -92,15 +92,17 @@ export type TChatMessage = {
 };
 
 type AskOptions = {
-  jsonMode?: boolean;   // ask the model to return raw JSON only
+  jsonMode?: boolean; // ask the model to return raw JSON only
   temperature?: number;
 };
 
 // tries each model in order until one responds; throws AppError if all fail
 export const askOpenRouter = async (
   messages: TChatMessage[],
-  options?: AskOptions
-): Promise<string> => { /* axios.post per FREE_MODELS entry, catch 429/5xx -> next */ };
+  options?: AskOptions,
+): Promise<string> => {
+  /* axios.post per FREE_MODELS entry, catch 429/5xx -> next */
+};
 ```
 
 Fallback list (kept as a local const, easy to edit as OpenRouter's free catalog
@@ -115,6 +117,7 @@ const FREE_MODELS = [
 ```
 
 Behavior:
+
 - POST to `/chat/completions` with `{ model, messages, temperature, response_format }`.
 - On `429` or `5xx` → try the next model in `FREE_MODELS`. On network/timeout → same.
 - Set an axios timeout (e.g. 20s) so one dead model doesn't stall the request.
@@ -128,11 +131,13 @@ Behavior:
 **Route:** `POST /api/ai/generate-description` (role: `VENDOR`, reuses `validateUser`)
 
 **Request body** (`ai.validation.ts` → `generateDescriptionValidationSchema`):
+
 ```ts
 { name: string; categoryId: string; keywords?: string; price?: number }
 ```
 
 **Service — `generateProductDescription`:**
+
 1. Look up the category name via `prisma.categories.findUnique` (gives the model
    real context instead of a raw UUID).
 2. Build a prompt instructing the model to return **strict JSON**:
@@ -153,14 +158,17 @@ drafts text; the existing `product.service.ts::addProduct` flow is unchanged.
 **Route:** `POST /api/ai/chat` (public — logged-out visitors can use it too)
 
 **Request body:**
+
 ```ts
 { message: string; history?: TChatMessage[] }  // client keeps and resends history
 ```
+
 Kept **stateless** on the server on purpose — no new `ChatMessage` Prisma model,
 no session storage. The client array is capped (e.g. last 10 turns) before it's
 sent back, so the server just forwards it.
 
 **Service — `chatWithAssistant`:**
+
 1. Fetch a small, cheap grounding set from the DB — reuse the shape from
    `productServices.getAllProducts`, but only pull
    `{ id, name, price, discount, category: { name } }` for ~15–20 active products
@@ -174,7 +182,7 @@ sent back, so the server just forwards it.
      ` ```json {"productIds": ["..."]} ``` ` listing any products it mentioned —
      this lets the frontend render real product cards without a second model call.
 3. Call `askOpenRouter([system, ...history, {role:"user", content: message}])`.
-4. Strip the trailing ```json``` block out of the text with a regex, `JSON.parse`
+4. Strip the trailing `json` block out of the text with a regex, `JSON.parse`
    it (default to `{ productIds: [] }` if missing/invalid), and return:
    ```ts
    { reply: string, productIds: string[] }
@@ -191,6 +199,7 @@ sent back, so the server just forwards it.
 **Request body:** `{ query: string }` e.g. `"cheap waterproof shoes under $50"`.
 
 **Service — `parseSmartSearch`:**
+
 1. Fetch the category list (`id`, `name`) from `prisma.categories` — small table,
    cheap to send in full.
 2. Prompt the model to output **strict JSON** matching the existing filter shape
@@ -238,18 +247,18 @@ so the frontend product-list component needs zero changes to consume it.
 
 ## 9. New files checklist
 
-| File | Purpose |
-|---|---|
-| `src/app/util/openRouterClient.ts` | reusable `askOpenRouter()` with model fallback |
-| `src/app/modules/ai/ai.interface.ts` | payload/response types |
-| `src/app/modules/ai/ai.validation.ts` | zod schemas for the 3 endpoints |
-| `src/app/modules/ai/ai.service.ts` | `generateProductDescription`, `chatWithAssistant`, `parseSmartSearch` |
-| `src/app/modules/ai/ai.controller.ts` | `catchAsync` handlers calling the services |
-| `src/app/modules/ai/ai.route.ts` | wires validation + `validateUser(VENDOR)` where needed |
-| `src/app/router/index.ts` (edit) | register `{ path: "/ai", route: aiRouter }` |
-| `src/app/config/index.ts` (edit) | add the 3 `openrouter_*` config keys |
-| `.env` (edit) | add `OPENROUTER_API_KEY`, `OPENROUTER_SITE_URL`, `OPENROUTER_SITE_NAME` |
-| `package.json` (edit) | add `express-rate-limit` |
+| File                                  | Purpose                                                                 |
+| ------------------------------------- | ----------------------------------------------------------------------- |
+| `src/app/util/openRouterClient.ts`    | reusable `askOpenRouter()` with model fallback                          |
+| `src/app/modules/ai/ai.interface.ts`  | payload/response types                                                  |
+| `src/app/modules/ai/ai.validation.ts` | zod schemas for the 3 endpoints                                         |
+| `src/app/modules/ai/ai.service.ts`    | `generateProductDescription`, `chatWithAssistant`, `parseSmartSearch`   |
+| `src/app/modules/ai/ai.controller.ts` | `catchAsync` handlers calling the services                              |
+| `src/app/modules/ai/ai.route.ts`      | wires validation + `validateUser(VENDOR)` where needed                  |
+| `src/app/router/index.ts` (edit)      | register `{ path: "/ai", route: aiRouter }`                             |
+| `src/app/config/index.ts` (edit)      | add the 3 `openrouter_*` config keys                                    |
+| `.env` (edit)                         | add `OPENROUTER_API_KEY`, `OPENROUTER_SITE_URL`, `OPENROUTER_SITE_NAME` |
+| `package.json` (edit)                 | add `express-rate-limit`                                                |
 
 ---
 
