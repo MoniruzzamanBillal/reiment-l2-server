@@ -22,3 +22,15 @@
 .vscode
 .vscode/
 .vscode/*
+
+
+
+
+.claude/
+.claude/settings.local.json
+CLAUDE.local.md
+
+CLAUDE.md
+
+
+**/CLAUDE.md
