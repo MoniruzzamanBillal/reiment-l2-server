@@ -125,10 +125,6 @@ const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
             userId: userId,
         };
         const transactionResult = yield (0, payment_util_1.initPayment)(tracsactionData);
-        console.log(transactionResult);
-        if (transactionResult === null || transactionResult === void 0 ? void 0 : transactionResult.tran_id) {
-            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, transactionResult === null || transactionResult === void 0 ? void 0 : transactionResult.tran_id);
-        }
         return transactionResult;
     }), { timeout: 20000 });
     return result;

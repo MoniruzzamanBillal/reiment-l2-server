@@ -145,12 +145,6 @@ const orderItem = async (payload: TOrderPayload, userId: string) => {
 
     const transactionResult = await initPayment(tracsactionData);
 
-    console.log(transactionResult);
-
-    if (transactionResult?.tran_id) {
-      throw new AppError(httpStatus.BAD_REQUEST, transactionResult?.tran_id);
-    }
-
     return transactionResult;
   }, { timeout: 20000 });
 
