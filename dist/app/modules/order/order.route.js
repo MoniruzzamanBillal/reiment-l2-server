@@ -6,8 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderRouter = void 0;
 const client_1 = require("@prisma/client");
 const express_1 = require("express");
+const validateRequest_1 = __importDefault(require("../../middleware/validateRequest"));
 const validateUser_1 = __importDefault(require("../../middleware/validateUser"));
 const order_controller_1 = require("./order.controller");
+const order_validation_1 = require("./order.validation");
 const router = (0, express_1.Router)();
 // ! for getting all transaction data
 router.get("/all-transaction", order_controller_1.orderController.getAllOrderTransactionData);
@@ -16,6 +18,6 @@ router.get("/user-order-history", (0, validateUser_1.default)(client_1.UserRole.
 // ! for getting vendor shop order
 router.get("/vendorShop-order-history", (0, validateUser_1.default)(client_1.UserRole.VENDOR), order_controller_1.orderController.getVendorOrderHistory);
 // ! for ordering item
-router.post("/order-item", (0, validateUser_1.default)(client_1.UserRole.CUSTOMER), order_controller_1.orderController.orderItem);
+router.post("/order-item", (0, validateUser_1.default)(client_1.UserRole.CUSTOMER), (0, validateRequest_1.default)(order_validation_1.orderValidations.orderItemValidationSchema), order_controller_1.orderController.orderItem);
 //
 exports.orderRouter = router;

@@ -16,21 +16,13 @@ exports.orderServices = void 0;
 const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../Error/AppError"));
+const coupon_service_1 = require("../coupon/coupon.service");
 const prisma_1 = __importDefault(require("../../util/prisma"));
 const payment_util_1 = require("../payment/payment.util");
 // ! for ordering product
 const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const { cartId, cuponId } = payload;
+    const { cartId, couponId } = payload;
     const trxnNumber = `TXN-${Date.now()}`;
-    let discountValue = 0;
-    if (cuponId) {
-        const couponData = yield prisma_1.default.coupon.findUnique({
-            where: {
-                id: cuponId,
-            },
-        });
-        discountValue = couponData === null || couponData === void 0 ? void 0 : couponData.discountValue;
-    }
     // get cart items
     const cartItems = yield prisma_1.default.cartItem.findMany({
         where: { cartId: cartId },
@@ -38,17 +30,57 @@ const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
     if (!cartItems.length) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Cart is empty");
     }
-    let totalPrice = cartItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
-    totalPrice -= discountValue;
-    const result = prisma_1.default.$transaction((trxnClient) => __awaiter(void 0, void 0, void 0, function* () {
+    const baseTotalPrice = cartItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
+    const result = yield prisma_1.default.$transaction((trxnClient) => __awaiter(void 0, void 0, void 0, function* () {
+        let discountAmount = 0;
+        if (couponId) {
+            // re-validate inside the transaction — a preview earlier isn't a guarantee at commit time
+            const coupon = yield trxnClient.coupon.findFirst({
+                where: { id: couponId, isDeleted: false },
+            });
+            if (!coupon) {
+                throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Coupon code not found.");
+            }
+            (0, coupon_service_1.assertCouponDatesValid)(coupon);
+            // atomic system-wide claim: only succeeds if a slot is still available,
+            // so concurrent checkouts serialize on the row lock instead of over-claiming
+            const claim = yield trxnClient.coupon.updateMany({
+                where: { id: couponId, usedCount: { lt: coupon.usageLimit } },
+                data: { usedCount: { increment: 1 } },
+            });
+            if (claim.count === 0) {
+                throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "This coupon has reached its maximum usage limit and can no longer be used.");
+            }
+            discountAmount = coupon.discountValue;
+        }
+        const totalPrice = baseTotalPrice - discountAmount;
         // create order data
         const order = yield trxnClient.order.create({
             data: {
                 customerId: userId,
                 totalPrice,
                 trxnNumber,
+                couponId: couponId !== null && couponId !== void 0 ? couponId : null,
+                discountAmount,
             },
         });
+        if (couponId) {
+            // atomic per-user claim — the [couponId, userId] unique constraint is the
+            // enforcement point; a violation here rolls back the usedCount increment
+            // and order creation above, together, since it's all one transaction
+            try {
+                yield trxnClient.couponUsage.create({
+                    data: { couponId, userId, orderId: order.id },
+                });
+            }
+            catch (error) {
+                if (error instanceof client_1.Prisma.PrismaClientKnownRequestError &&
+                    error.code === "P2002") {
+                    throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "You have already used this coupon.");
+                }
+                throw error;
+            }
+        }
         // crete order item data
         const orderItems = cartItems.map((item) => ({
             orderId: order === null || order === void 0 ? void 0 : order.id,
@@ -98,7 +130,7 @@ const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
             throw new AppError_1.default(http_status_1.default.BAD_REQUEST, transactionResult === null || transactionResult === void 0 ? void 0 : transactionResult.tran_id);
         }
         return transactionResult;
-    }));
+    }), { timeout: 20000 });
     return result;
 });
 // ! for getting user order

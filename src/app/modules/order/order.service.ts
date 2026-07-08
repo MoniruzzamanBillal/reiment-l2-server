@@ -1,28 +1,16 @@
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus, Prisma } from "@prisma/client";
 import httpStatus from "http-status";
 import AppError from "../../Error/AppError";
+import { assertCouponDatesValid } from "../coupon/coupon.service";
 import prisma from "../../util/prisma";
 import { initPayment } from "../payment/payment.util";
+import { TOrderPayload } from "./order.interface";
 
 // ! for ordering product
-const orderItem = async (
-  payload: { cartId: string; cuponId?: string },
-  userId: string
-) => {
-  const { cartId, cuponId } = payload;
+const orderItem = async (payload: TOrderPayload, userId: string) => {
+  const { cartId, couponId } = payload;
 
   const trxnNumber = `TXN-${Date.now()}`;
-
-  let discountValue = 0;
-
-  if (cuponId) {
-    const couponData = await prisma.coupon.findUnique({
-      where: {
-        id: cuponId,
-      },
-    });
-    discountValue = couponData?.discountValue as number;
-  }
 
   // get cart items
   const cartItems = await prisma.cartItem.findMany({
@@ -33,22 +21,77 @@ const orderItem = async (
     throw new AppError(httpStatus.BAD_REQUEST, "Cart is empty");
   }
 
-  let totalPrice = cartItems.reduce(
+  const baseTotalPrice = cartItems.reduce(
     (sum, item) => sum + item.quantity * item.price,
     0
   );
 
-  totalPrice -= discountValue;
+  const result = await prisma.$transaction(async (trxnClient) => {
+    let discountAmount = 0;
 
-  const result = prisma.$transaction(async (trxnClient) => {
+    if (couponId) {
+      // re-validate inside the transaction — a preview earlier isn't a guarantee at commit time
+      const coupon = await trxnClient.coupon.findFirst({
+        where: { id: couponId, isDeleted: false },
+      });
+
+      if (!coupon) {
+        throw new AppError(httpStatus.NOT_FOUND, "Coupon code not found.");
+      }
+
+      assertCouponDatesValid(coupon);
+
+      // atomic system-wide claim: only succeeds if a slot is still available,
+      // so concurrent checkouts serialize on the row lock instead of over-claiming
+      const claim = await trxnClient.coupon.updateMany({
+        where: { id: couponId, usedCount: { lt: coupon.usageLimit } },
+        data: { usedCount: { increment: 1 } },
+      });
+
+      if (claim.count === 0) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          "This coupon has reached its maximum usage limit and can no longer be used."
+        );
+      }
+
+      discountAmount = coupon.discountValue;
+    }
+
+    const totalPrice = baseTotalPrice - discountAmount;
+
     // create order data
     const order = await trxnClient.order.create({
       data: {
         customerId: userId,
         totalPrice,
         trxnNumber,
+        couponId: couponId ?? null,
+        discountAmount,
       },
     });
+
+    if (couponId) {
+      // atomic per-user claim — the [couponId, userId] unique constraint is the
+      // enforcement point; a violation here rolls back the usedCount increment
+      // and order creation above, together, since it's all one transaction
+      try {
+        await trxnClient.couponUsage.create({
+          data: { couponId, userId, orderId: order.id },
+        });
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === "P2002"
+        ) {
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            "You have already used this coupon."
+          );
+        }
+        throw error;
+      }
+    }
 
     // crete order item data
     const orderItems = cartItems.map((item) => ({
@@ -109,7 +152,7 @@ const orderItem = async (
     }
 
     return transactionResult;
-  });
+  }, { timeout: 20000 });
 
   return result;
 };

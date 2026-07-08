@@ -25,6 +25,7 @@ model User {
   address             Address[]
   review              Review[]
   follower            Follower[]
+  couponUsage         CouponUsage[]
 
   @@map("users")
 }
@@ -126,6 +127,11 @@ model Order {
   isDelated  Boolean @default(false)
   trxnNumber String? @unique
 
+  couponId       String?
+  coupon         Coupon?      @relation(fields: [couponId], references: [id])
+  discountAmount Float        @default(0)
+  couponUsage    CouponUsage?
+
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   orderItem OrderItem[]
@@ -213,12 +219,30 @@ model Coupon {
 
   usageLimit Int
   usedCount  Int      @default(0)
+  startDate  DateTime
+  endDate    DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  isDeleted Boolean @default(false)
+  isDeleted   Boolean       @default(false)
+  couponUsage CouponUsage[]
+  order       Order[]
 
   @@map("coupon")
+}
+
+model CouponUsage {
+  id        String   @id @default(uuid())
+  couponId  String
+  coupon    Coupon   @relation(fields: [couponId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([couponId, userId])
+  @@map("couponUsage")
 }
 
 enum UserRole {

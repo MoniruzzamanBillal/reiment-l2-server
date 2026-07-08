@@ -31,20 +31,42 @@ const addCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
 const getAllCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield coupon_service_1.couponServices.getAllCoupon();
     (0, sendResponse_1.default)(res, {
-        status: http_status_1.default.CREATED,
+        status: http_status_1.default.OK,
         success: true,
         message: "Coupon retrived successfully!!!",
         data: result,
     });
 }));
-// ! for getting single coupon
+// ! for getting single coupon by id (admin update-page prefill)
 const getSingleCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const result = yield coupon_service_1.couponServices.getSingleCoupon((_a = req.body) === null || _a === void 0 ? void 0 : _a.coupon);
+    const result = yield coupon_service_1.couponServices.getSingleCouponById((_a = req.params) === null || _a === void 0 ? void 0 : _a.id);
     (0, sendResponse_1.default)(res, {
-        status: http_status_1.default.CREATED,
+        status: http_status_1.default.OK,
         success: true,
         message: "Coupon retrived successfully!!!",
+        data: result,
+    });
+}));
+// ! for updating coupon
+const updateCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const result = yield coupon_service_1.couponServices.updateCoupon((_a = req.params) === null || _a === void 0 ? void 0 : _a.id, req.body);
+    (0, sendResponse_1.default)(res, {
+        status: http_status_1.default.OK,
+        success: true,
+        message: "Coupon updated successfully!!!",
+        data: result,
+    });
+}));
+// ! for previewing/applying coupon at checkout
+const previewApplyCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const result = yield coupon_service_1.couponServices.previewApplyCoupon((_a = req.body) === null || _a === void 0 ? void 0 : _a.code, (_b = req.user) === null || _b === void 0 ? void 0 : _b.userId);
+    (0, sendResponse_1.default)(res, {
+        status: http_status_1.default.OK,
+        success: true,
+        message: "Coupon applied successfully!!!",
         data: result,
     });
 }));
@@ -53,7 +75,7 @@ const deleteCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
     var _a;
     const result = yield coupon_service_1.couponServices.handleDeleteCoupon((_a = req.params) === null || _a === void 0 ? void 0 : _a.id);
     (0, sendResponse_1.default)(res, {
-        status: http_status_1.default.CREATED,
+        status: http_status_1.default.OK,
         success: true,
         message: "Coupon deleted successfully!!!",
         data: result,
@@ -62,7 +84,9 @@ const deleteCoupon = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
 //
 exports.couponController = {
     addCoupon,
-    getSingleCoupon,
-    deleteCoupon,
     getAllCoupon,
+    getSingleCoupon,
+    updateCoupon,
+    previewApplyCoupon,
+    deleteCoupon,
 };
