@@ -1,7 +1,9 @@
 import { UserRole } from "@prisma/client";
 import { Router } from "express";
+import validateRequest from "../../middleware/validateRequest";
 import validateUser from "../../middleware/validateUser";
 import { orderController } from "./order.controller";
+import { orderValidations } from "./order.validation";
 
 const router = Router();
 
@@ -26,6 +28,7 @@ router.get(
 router.post(
   "/order-item",
   validateUser(UserRole.CUSTOMER),
+  validateRequest(orderValidations.orderItemValidationSchema),
   orderController.orderItem
 );
 

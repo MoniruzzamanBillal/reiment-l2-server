@@ -20,21 +20,48 @@ const getAllCoupon = catchAsync(async (req, res) => {
   const result = await couponServices.getAllCoupon();
 
   sendResponse(res, {
-    status: httpStatus.CREATED,
+    status: httpStatus.OK,
     success: true,
     message: "Coupon retrived successfully!!!",
     data: result,
   });
 });
 
-// ! for getting single coupon
+// ! for getting single coupon by id (admin update-page prefill)
 const getSingleCoupon = catchAsync(async (req, res) => {
-  const result = await couponServices.getSingleCoupon(req.body?.coupon);
+  const result = await couponServices.getSingleCouponById(req.params?.id);
 
   sendResponse(res, {
-    status: httpStatus.CREATED,
+    status: httpStatus.OK,
     success: true,
     message: "Coupon retrived successfully!!!",
+    data: result,
+  });
+});
+
+// ! for updating coupon
+const updateCoupon = catchAsync(async (req, res) => {
+  const result = await couponServices.updateCoupon(req.params?.id, req.body);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Coupon updated successfully!!!",
+    data: result,
+  });
+});
+
+// ! for previewing/applying coupon at checkout
+const previewApplyCoupon = catchAsync(async (req, res) => {
+  const result = await couponServices.previewApplyCoupon(
+    req.body?.code,
+    req.user?.userId
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Coupon applied successfully!!!",
     data: result,
   });
 });
@@ -44,7 +71,7 @@ const deleteCoupon = catchAsync(async (req, res) => {
   const result = await couponServices.handleDeleteCoupon(req.params?.id);
 
   sendResponse(res, {
-    status: httpStatus.CREATED,
+    status: httpStatus.OK,
     success: true,
     message: "Coupon deleted successfully!!!",
     data: result,
@@ -54,7 +81,9 @@ const deleteCoupon = catchAsync(async (req, res) => {
 //
 export const couponController = {
   addCoupon,
-  getSingleCoupon,
-  deleteCoupon,
   getAllCoupon,
+  getSingleCoupon,
+  updateCoupon,
+  previewApplyCoupon,
+  deleteCoupon,
 };

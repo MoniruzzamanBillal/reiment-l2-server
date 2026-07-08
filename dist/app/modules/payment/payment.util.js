@@ -14,7 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.initPayment = void 0;
 const axios_1 = __importDefault(require("axios"));
+const http_status_1 = __importDefault(require("http-status"));
 const qs_1 = __importDefault(require("qs"));
+const AppError_1 = __importDefault(require("../../Error/AppError"));
 const config_1 = __importDefault(require("../../config"));
 // ! for initializing payment
 const initPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -62,11 +64,16 @@ const initPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () 
         //   headers: { "Content-Type": "application/x-www-form-urlencoded" },
         // });
         const response = yield axios_1.default.post(config_1.default === null || config_1.default === void 0 ? void 0 : config_1.default.SSL_PAYMENT_URL, qs_1.default.stringify(data), { headers: { "Content-Type": "application/x-www-form-urlencoded" } });
-        return (_b = (_a = response === null || response === void 0 ? void 0 : response.data) === null || _a === void 0 ? void 0 : _a.desc[6]) === null || _b === void 0 ? void 0 : _b.redirectGatewayURL;
+        if (((_a = response === null || response === void 0 ? void 0 : response.data) === null || _a === void 0 ? void 0 : _a.status) !== "SUCCESS") {
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, ((_b = response === null || response === void 0 ? void 0 : response.data) === null || _b === void 0 ? void 0 : _b.failedreason) || "Payment initialization failed.");
+        }
+        return response.data.GatewayPageURL;
     }
     catch (error) {
+        if (error instanceof AppError_1.default)
+            throw error;
         console.log(error);
-        throw new Error(error);
+        throw new AppError_1.default(http_status_1.default.BAD_GATEWAY, (error === null || error === void 0 ? void 0 : error.message) || "Payment gateway request failed.");
     }
 });
 exports.initPayment = initPayment;

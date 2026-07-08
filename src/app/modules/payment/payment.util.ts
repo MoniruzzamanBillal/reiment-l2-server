@@ -1,5 +1,7 @@
 import axios from "axios";
+import httpStatus from "http-status";
 import QueryString from "qs";
+import AppError from "../../Error/AppError";
 import config from "../../config";
 
 // const redirectLink = "https://reiment-l2-server.vercel.app/api";
@@ -67,9 +69,20 @@ export const initPayment = async (payload: TPaymentData) => {
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
-    return response?.data?.desc[6]?.redirectGatewayURL;
+    if (response?.data?.status !== "SUCCESS") {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        response?.data?.failedreason || "Payment initialization failed."
+      );
+    }
+
+    return response.data.GatewayPageURL;
   } catch (error: any) {
+    if (error instanceof AppError) throw error;
     console.log(error);
-    throw new Error(error);
+    throw new AppError(
+      httpStatus.BAD_GATEWAY,
+      error?.message || "Payment gateway request failed."
+    );
   }
 };
