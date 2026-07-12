@@ -30,7 +30,6 @@ const FREE_MODELS = [
   "nvidia/nemotron-3-nano-30b-a3b:free",
 
   "meta-llama/llama-3.2-3b-instruct:free",
-  // "deepseek/deepseek-chat-v3.1:free",
 
   "qwen/qwen3-next-80b-a3b-instruct:free",
 ];
