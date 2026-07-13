@@ -15,6 +15,12 @@ Tracks work items defined in `context/specs/`. Update the moment implementation 
 | [`01-ai-integration.md`](specs/01-ai-integration.md) | ✅ Complete | `ai` module (`generate-description`, `chat`, `smart-search`) scaffolded and wired into `router/index.ts`, all routed through `askOpenRouter`. Delivered per the root `implementationplan.md`. |
 | [`02-coupon-feature.md`](specs/02-coupon-feature.md) | ✅ Complete | Re-verified against `coupon-implementation-plan.md` (root): schema (`startDate`/`endDate`, `CouponUsage` model), the atomic `usedCount` claim + `CouponUsage` P2002 race-guard inside `order.service.ts`'s `$transaction`, the `POST /coupon/apply-coupon` preview endpoint, and the `cuponId`→`couponId` fix are all present and correct (landed in `9e2ee770`; the doc had gone stale, this row corrects it). |
 | [`03-followed-shops-filter.md`](specs/03-followed-shops-filter.md) | ✅ Complete | `shopIds` filter branch + `totalItems` count fix landed in `product.service.ts`/`product.controller.ts`, simultaneously with the frontend toggle. `yarn build`/`yarn lint` pass (lint output is pre-existing unrelated warnings only). |
+| [`04-backend-testing.md`](specs/04-backend-testing.md) | ⛔ Not started | Jest + Supertest integration tests for coupon/follower/auth modules against a real test database. No test suite exists today. |
+| [`05-ci-pipeline-backend.md`](specs/05-ci-pipeline-backend.md) | ⛔ Not started | GitHub Actions workflow with an ephemeral Postgres service; lint/build/migrate/test. Depends on `04`. |
+| [`06-realtime-notifications-backend.md`](specs/06-realtime-notifications-backend.md) | ⛔ Not started | Socket.io server emitting `new-order`/`order-status-changed`. Candidate depth feature (alt: `07`). Pairs with client spec `10`. |
+| [`07-payment-module-hardening.md`](specs/07-payment-module-hardening.md) | ⛔ Not started | Type the SSLCommerz webhook payload, add idempotency guard, evaluate `val_id` validation. Candidate depth feature (alt: `06`). |
+| [`08-backend-code-quality-cleanup.md`](specs/08-backend-code-quality-cleanup.md) | ⛔ Not started | Replace remaining `any` signatures with typed interfaces (outside `payment/`); remove unused `bcrypt` dependency. |
+| [`09-dockerization.md`](specs/09-dockerization.md) | ⛔ Not started | API `Dockerfile` + `docker-compose.yml` (Postgres + API + client). Owns the shared compose file; coordinates with client spec `12`. |
 
 ## Completed (already implemented, wired into `router/index.ts`)
 
