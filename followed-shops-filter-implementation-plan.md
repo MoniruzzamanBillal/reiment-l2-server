@@ -1,6 +1,6 @@
 # "Only Shops I Follow" Product Filter — Backend Implementation Plan
 
-Status: planned, not yet implemented. Check items off as they're built.
+Status: ✅ Implemented — `shopIds` filter branch and the `totalItems` count fix landed in `product.service.ts`/`product.controller.ts`, simultaneously with the frontend toggle.
 
 ## Context
 
@@ -17,10 +17,10 @@ everything required.
 
 ## 1. `src/app/modules/products/product.service.ts` — `getAllProducts` (~line 171)
 
-- [ ] Accept a new `filter.shopIds` — a comma-separated string of shop IDs. If present, split it (`.split(",")`)
+- [x] Accept a new `filter.shopIds` — a comma-separated string of shop IDs. If present, split it (`.split(",")`)
       and add `andConditions.push({ shopId: { in: shopIds } })`, following the same pattern as the existing
       `categoryId`/`priceRange` branches.
-- [ ] Fix `totalItems` to reuse the same `andConditions` (and `isDelated: false`) filter that `allProducts` uses,
+- [x] Fix `totalItems` to reuse the same `andConditions` (and `isDelated: false`) filter that `allProducts` uses,
       instead of unconditionally counting all non-deleted products via a separate `prisma.products.count({
       where: { isDelated: false } })`. This is a pre-existing bug independent of this feature, but it must be
       fixed here — otherwise turning the new filter on will report a `totalItems`/pagination count for the
@@ -29,7 +29,7 @@ everything required.
 
 ## 2. `src/app/modules/products/product.controller.ts` — `getAllProducts` (line ~61-66)
 
-- [ ] Add `"shopIds"` to the `pick(req.query, ["searchTerm", "categoryId", "priceRange", "userId"])` array for
+- [x] Add `"shopIds"` to the `pick(req.query, ["searchTerm", "categoryId", "priceRange", "userId"])` array for
       `filter`. (Leave the existing unused `userId` pick as-is — out of scope for this change.)
 
 ## Already in place — no action needed

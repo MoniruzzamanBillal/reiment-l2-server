@@ -68,6 +68,7 @@ const getAllProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         "categoryId",
         "priceRange",
         "userId",
+        "shopIds",
     ]);
     const result = yield product_service_1.productServices.getAllProducts(options, filter);
     (0, sendResponse_1.default)(res, {

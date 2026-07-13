@@ -63,6 +63,7 @@ const getAllProducts = catchAsync(async (req, res) => {
     "categoryId",
     "priceRange",
     "userId",
+    "shopIds",
   ]);
 
   const result = await productServices.getAllProducts(options, filter);

@@ -1,6 +1,6 @@
 # 02: Coupon Feature
 
-Status: ⛔ Not started. Full checklist lives in root `coupon-implementation-plan.md` — this is a condensed summary, not a replacement for it.
+Status: ✅ Complete. Full checklist lives in root `coupon-implementation-plan.md` — this is a condensed summary, not a replacement for it.
 
 ## Goal
 
