@@ -161,6 +161,14 @@ const getAllProducts = (options, filter) => __awaiter(void 0, void 0, void 0, fu
             },
         });
     }
+    if (filter === null || filter === void 0 ? void 0 : filter.shopIds) {
+        const shopIds = String(filter.shopIds).split(",");
+        andConditions.push({
+            shopId: {
+                in: shopIds,
+            },
+        });
+    }
     const allProducts = yield prisma_1.default.products.findMany({
         where: {
             AND: andConditions,
@@ -177,7 +185,7 @@ const getAllProducts = (options, filter) => __awaiter(void 0, void 0, void 0, fu
         },
     });
     const totalItems = yield prisma_1.default.products.count({
-        where: { isDelated: false },
+        where: { AND: andConditions, isDelated: false },
     });
     return {
         data: allProducts,

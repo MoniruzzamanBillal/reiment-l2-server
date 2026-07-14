@@ -1,6 +1,6 @@
 # 03: Followed Shops Product Filter
 
-Status: 📝 Planned, awaiting user review/approval. Full checklist lives in root `followed-shops-filter-implementation-plan.md` — this is a condensed summary, not a replacement for it.
+Status: ✅ Complete. Full checklist lives in root `followed-shops-filter-implementation-plan.md` — this is a condensed summary, not a replacement for it.
 
 ## Goal
 

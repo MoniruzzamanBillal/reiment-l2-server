@@ -201,6 +201,15 @@ const getAllProducts = async (options: IPaginationOptions, filter: any) => {
     });
   }
 
+  if (filter?.shopIds) {
+    const shopIds = String(filter.shopIds).split(",");
+    andConditions.push({
+      shopId: {
+        in: shopIds,
+      },
+    });
+  }
+
   const allProducts = await prisma.products.findMany({
     where: {
       AND: andConditions,
@@ -219,7 +228,7 @@ const getAllProducts = async (options: IPaginationOptions, filter: any) => {
   });
 
   const totalItems = await prisma.products.count({
-    where: { isDelated: false },
+    where: { AND: andConditions, isDelated: false },
   });
 
   return {

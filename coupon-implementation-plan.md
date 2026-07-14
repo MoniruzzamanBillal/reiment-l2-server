@@ -1,6 +1,6 @@
 # Coupon Feature — Backend Implementation Plan
 
-Status: planned, not yet implemented. Check items off as they're built.
+Status: ✅ Implemented (commit `9e2ee770 feat: added coupon functionality`). Verified against this checklist and confirmed complete — schema, service, controller, route auth/validation, and the `order.service.ts` transactional rewrite (atomic `usedCount` claim, `CouponUsage` P2002 guard, `cuponId`→`couponId` fix) all match.
 
 ## Context
 
@@ -12,9 +12,9 @@ guard — all validated at both a read-only "preview" step and an atomic "commit
 
 ## 1. Prisma schema — `prisma/schema.prisma`
 
-- [ ] Add `startDate DateTime` and `endDate DateTime` to `Coupon`.
-- [ ] Add back-relations to `Coupon`: `couponUsage CouponUsage[]`, `order Order[]`.
-- [ ] Add new model `CouponUsage` (the per-user one-time-use guard):
+- [x] Add `startDate DateTime` and `endDate DateTime` to `Coupon`.
+- [x] Add back-relations to `Coupon`: `couponUsage CouponUsage[]`, `order Order[]`.
+- [x] Add new model `CouponUsage` (the per-user one-time-use guard):
 
   ```prisma
   model CouponUsage {
@@ -32,93 +32,93 @@ guard — all validated at both a read-only "preview" step and an atomic "commit
   }
   ```
 
-- [ ] Add `couponId String?`, `coupon Coupon? @relation(...)`, `discountAmount Float @default(0)`, and
+- [x] Add `couponId String?`, `coupon Coupon? @relation(...)`, `discountAmount Float @default(0)`, and
       `couponUsage CouponUsage?` to `Order` (nullable — most orders have no coupon; `discountAmount` snapshots
       what was actually applied, independent of the coupon's current `discountValue`).
-- [ ] Add `couponUsage CouponUsage[]` back-relation to `User`.
-- [ ] Run `npx prisma migrate dev --name add_coupon_date_range_and_usage_tracking`.
-- [ ] **Decision needed before migrating**: `startDate`/`endDate` are non-nullable. If any coupon rows already
+- [x] Add `couponUsage CouponUsage[]` back-relation to `User`.
+- [x] Run `npx prisma migrate dev --name add_coupon_date_range_and_usage_tracking`.
+- [x] **Decision needed before migrating**: `startDate`/`endDate` are non-nullable. If any coupon rows already
       exist in the dev DB without dates, either clear that test data first or the migration will fail /
       require a temporary default — flag this rather than silently defaulting in the schema.
 
 ## 2. `src/app/modules/coupon/coupon.interface.ts` — rewrite
 
-- [ ] `TCoupon = { code: string; discountValue: number; usageLimit: number; startDate: Date; endDate: Date }`
-- [ ] Add `TCouponUpdate = Partial<TCoupon>`
+- [x] `TCoupon = { code: string; discountValue: number; usageLimit: number; startDate: Date; endDate: Date }`
+- [x] Add `TCouponUpdate = Partial<TCoupon>`
 
 ## 3. `src/app/modules/coupon/coupon.validation.ts` — new file (doesn't exist today)
 
-- [ ] `addCouponValidationSchema` — zod object matching `TCoupon`, `discountValue`/`usageLimit` as `z.number()`
+- [x] `addCouponValidationSchema` — zod object matching `TCoupon`, `discountValue`/`usageLimit` as `z.number()`
       (positive, `usageLimit` an int), `startDate`/`endDate` as `z.coerce.date()`, with a `.refine()` that
       `endDate > startDate`.
-- [ ] `updateCouponValidationSchema` — same shape, all fields `.optional()`.
-- [ ] `applyCouponValidationSchema` — `{ code: z.string().min(1) }` (the checkout "preview apply" payload).
-- [ ] Export all three as `couponValidations`, following the `product.validation.ts` pattern.
+- [x] `updateCouponValidationSchema` — same shape, all fields `.optional()`.
+- [x] `applyCouponValidationSchema` — `{ code: z.string().min(1) }` (the checkout "preview apply" payload).
+- [x] Export all three as `couponValidations`, following the `product.validation.ts` pattern.
 
 ## 4. `src/app/modules/coupon/coupon.service.ts` — rewrite
 
-- [ ] `addCoupon`: fix existing-code check from `contains` (partial match, a latent bug — "SAVE1" matches
+- [x] `addCoupon`: fix existing-code check from `contains` (partial match, a latent bug — "SAVE1" matches
       "SAVE10") to an exact match; `isDeleted: false` in the where clause.
-- [ ] `getAllCoupon`: filter `isDeleted: false`, add `orderBy: { createdAt: "desc" }`.
-- [ ] New `getSingleCouponById(couponId)`: exact `findUnique`-style lookup (for the admin update-page prefill),
+- [x] `getAllCoupon`: filter `isDeleted: false`, add `orderBy: { createdAt: "desc" }`.
+- [x] New `getSingleCouponById(couponId)`: exact `findUnique`-style lookup (for the admin update-page prefill),
       throws `AppError(400, "Coupon not found.")` if missing/soft-deleted.
-- [ ] New `updateCoupon(couponId, payload)`: mirrors `category.service.ts`'s `updateCategory` — look up first
+- [x] New `updateCoupon(couponId, payload)`: mirrors `category.service.ts`'s `updateCategory` — look up first
       (404 if missing), then `prisma.coupon.update(...)`.
-- [ ] `handleDeleteCoupon`: change from a real hard `prisma.coupon.delete()` to a **soft delete**
+- [x] `handleDeleteCoupon`: change from a real hard `prisma.coupon.delete()` to a **soft delete**
       (`data: { isDeleted: true }`), matching the rest of the app's convention (categories etc.) — add an
       existence check first.
-- [ ] New shared validator `validateCouponForUse(code)` — read-only, no mutation, exact-match lookup
+- [x] New shared validator `validateCouponForUse(code)` — read-only, no mutation, exact-match lookup
       (`isDeleted: false`), then throws on: - not found → `AppError(404, "Coupon code not found.")` - `now < startDate` → `AppError(400, "This coupon is not active yet. It becomes valid on {startDate}.")` - `now > endDate` → `AppError(400, "This coupon expired on {endDate}.")` — the specific expiry message
       the user asked for. - `usedCount >= usageLimit` → `AppError(400, "This coupon has reached its maximum usage limit and can no
     longer be used.")` - otherwise returns the coupon row.
-- [ ] New `checkUserCouponEligibility(couponId, userId)` — read-only, looks up
+- [x] New `checkUserCouponEligibility(couponId, userId)` — read-only, looks up
       `couponUsage.findUnique({ where: { couponId_userId: { couponId, userId } } })`; if found, throws
       `AppError(400, "You have already used this coupon.")`.
-- [ ] New `previewApplyCoupon(code, userId)` — calls `validateCouponForUse` then
+- [x] New `previewApplyCoupon(code, userId)` — calls `validateCouponForUse` then
       `checkUserCouponEligibility`, returns the coupon row (id, code, discountValue, etc.) for the checkout
       page to display.
-- [ ] Export `couponServices = { addCoupon, updateCoupon, getAllCoupon, getSingleCouponById,
+- [x] Export `couponServices = { addCoupon, updateCoupon, getAllCoupon, getSingleCouponById,
   handleDeleteCoupon, previewApplyCoupon, validateCouponForUse, checkUserCouponEligibility }` (last two
       exported so `order.service.ts` can reuse the same message strings/comparison logic at commit time).
 
 ## 5. `src/app/modules/coupon/coupon.controller.ts` — modify
 
-- [ ] Rename `getSingleCoupon` → `previewApplyCoupon`: reads `req.body.code` (was the mismatched
+- [x] Rename `getSingleCoupon` → `previewApplyCoupon`: reads `req.body.code` (was the mismatched
       `req.body?.coupon`) and `req.user?.userId`, calls the new service function.
-- [ ] Add `getSingleCoupon` (by `:id`, admin-only, for update-page prefill).
-- [ ] Add `updateCoupon` controller.
-- [ ] Fix response status codes: `getAllCoupon` / `getSingleCoupon` / `previewApplyCoupon` / `deleteCoupon` /
+- [x] Add `getSingleCoupon` (by `:id`, admin-only, for update-page prefill).
+- [x] Add `updateCoupon` controller.
+- [x] Fix response status codes: `getAllCoupon` / `getSingleCoupon` / `previewApplyCoupon` / `deleteCoupon` /
       `updateCoupon` should send `httpStatus.OK` (200), not the currently-wrong `httpStatus.CREATED` (201).
       `addCoupon` correctly stays `201`.
 
 ## 6. `src/app/modules/coupon/coupon.route.ts` — rewrite
 
-- [ ] `GET /all-coupon` → `validateUser(UserRole.ADMIN)`
-- [ ] `POST /add-coupon` → `validateUser(UserRole.ADMIN)` + `validateRequest(addCouponValidationSchema)`
-- [ ] `GET /get-coupon/:id` (new — admin by-id lookup) → `validateUser(UserRole.ADMIN)`
-- [ ] `PATCH /update-coupon/:id` (new) → `validateUser(UserRole.ADMIN)` + `validateRequest(updateCouponValidationSchema)`
-- [ ] `PATCH /delete-coupon/:id` → `validateUser(UserRole.ADMIN)`
-- [ ] `POST /apply-coupon` (new — replaces the old public `POST /get-coupon`) → `validateUser(UserRole.CUSTOMER)` + `validateRequest(applyCouponValidationSchema)` — this is the checkout page's "Apply" button target.
-- [ ] **All 6 routes currently have zero auth/validation middleware** — this closes that gap entirely (today
+- [x] `GET /all-coupon` → `validateUser(UserRole.ADMIN)`
+- [x] `POST /add-coupon` → `validateUser(UserRole.ADMIN)` + `validateRequest(addCouponValidationSchema)`
+- [x] `GET /get-coupon/:id` (new — admin by-id lookup) → `validateUser(UserRole.ADMIN)`
+- [x] `PATCH /update-coupon/:id` (new) → `validateUser(UserRole.ADMIN)` + `validateRequest(updateCouponValidationSchema)`
+- [x] `PATCH /delete-coupon/:id` → `validateUser(UserRole.ADMIN)`
+- [x] `POST /apply-coupon` (new — replaces the old public `POST /get-coupon`) → `validateUser(UserRole.CUSTOMER)` + `validateRequest(applyCouponValidationSchema)` — this is the checkout page's "Apply" button target.
+- [x] **All 6 routes currently have zero auth/validation middleware** — this closes that gap entirely (today
       anyone unauthenticated can create/list/delete coupons).
 
 ## 7. `src/app/modules/order/order.interface.ts` — populate (currently empty)
 
-- [ ] `TOrderPayload = { cartId: string; couponId?: string }`
+- [x] `TOrderPayload = { cartId: string; couponId?: string }`
 
 ## 8. `src/app/modules/order/order.validation.ts` — populate (currently empty)
 
-- [ ] `orderItemValidationSchema`: `{ cartId: z.string().min(1), couponId: z.string().optional() }`
+- [x] `orderItemValidationSchema`: `{ cartId: z.string().min(1), couponId: z.string().optional() }`
 
 ## 9. `src/app/modules/order/order.route.ts` — modify
 
-- [ ] Add `validateRequest(orderValidations.orderItemValidationSchema)` to `POST /order-item`, after the
+- [x] Add `validateRequest(orderValidations.orderItemValidationSchema)` to `POST /order-item`, after the
       existing `validateUser(UserRole.CUSTOMER)` (already in place — no change needed there).
 
 ## 10. `src/app/modules/order/order.service.ts` — core transactional rewrite
 
-- [ ] **Fix the `cuponId` → `couponId` typo** (the root cause of discounts never applying today).
-- [ ] Inside the existing `prisma.$transaction`, in this exact order:
+- [x] **Fix the `cuponId` → `couponId` typo** (the root cause of discounts never applying today).
+- [x] Inside the existing `prisma.$transaction`, in this exact order:
   1. If `couponId` present: re-validate inside the transaction (`trxnClient.coupon.findFirst`, `isDeleted: false`)
      — existence, `startDate`/`endDate` checks — using the **same message strings** as `validateCouponForUse`
      (extract the pure date-comparison logic into a small shared helper, e.g. `assertCouponDatesValid(coupon)`,
@@ -140,7 +140,7 @@ coupon.usageLimit } }, data: { usedCount: { increment: 1 } } })` — if `claim.c
      order creation from steps 2–4 together — no partial state is possible.
   6. All existing steps (orderItem creation, cart/cartItem cleanup, inventory decrement loop, `initPayment`
      call) stay exactly where they are today, unchanged relative to each other.
-- [ ] No changes needed to `payment.service.ts` — per the confirmed decision, coupon accounting happens at
+- [x] No changes needed to `payment.service.ts` — per the confirmed decision, coupon accounting happens at
       order-placement, not the SSLCommerz success callback.
 
 ## 11. Error message matrix (preview vs. commit — same wording, different enforcement point)

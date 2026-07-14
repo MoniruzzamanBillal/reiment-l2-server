@@ -1,7 +1,7 @@
-import { Router } from "express";
-import { followerController } from "./follower.controller";
-import validateUser from "../../middleware/validateUser";
 import { UserRole } from "@prisma/client";
+import { Router } from "express";
+import validateUser from "../../middleware/validateUser";
+import { followerController } from "./follower.controller";
 
 const router = Router();
 
@@ -9,21 +9,21 @@ const router = Router();
 router.get(
   "/logged-user-data",
   validateUser(UserRole.CUSTOMER),
-  followerController.getLoggedUserData
+  followerController.getLoggedUserData,
 );
 
 // ! for following a shop
 router.post(
   "/follow-shop",
   validateUser(UserRole.CUSTOMER),
-  followerController.followShop
+  followerController.followShop,
 );
 
 // ! for unfollowing a shop
 router.delete(
   "/unfollow-shop",
   validateUser(UserRole.CUSTOMER),
-  followerController.unfollowShop
+  followerController.unfollowShop,
 );
 
 //

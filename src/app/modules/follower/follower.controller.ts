@@ -6,7 +6,7 @@ import { followerService } from "./follower.service";
 // ! get logged in user follower data
 const getLoggedUserData = catchAsync(async (req, res) => {
   const result = await followerService.getLoggedUserFollowShop(
-    req.user?.userId
+    req.user?.userId,
   );
 
   sendResponse(res, {
@@ -21,7 +21,7 @@ const getLoggedUserData = catchAsync(async (req, res) => {
 const followShop = catchAsync(async (req, res) => {
   const result = await followerService.followShop(
     req.body?.shopId,
-    req.user?.userId
+    req.user?.userId,
   );
 
   sendResponse(res, {
@@ -36,7 +36,7 @@ const followShop = catchAsync(async (req, res) => {
 const unfollowShop = catchAsync(async (req, res) => {
   const result = await followerService.unfollowShop(
     req.body?.shopId,
-    req.user?.userId
+    req.user?.userId,
   );
 
   sendResponse(res, {
