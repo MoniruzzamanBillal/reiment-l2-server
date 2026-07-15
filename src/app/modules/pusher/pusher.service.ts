@@ -11,7 +11,7 @@ const CUSTOMER_CHANNEL_PREFIX = "private-customer-";
 const authorizeChannel = async (
   socketId: string,
   channelName: string,
-  user: JwtPayload
+  user: JwtPayload,
 ) => {
   if (channelName.startsWith(VENDOR_CHANNEL_PREFIX)) {
     const requestedShopId = channelName.slice(VENDOR_CHANNEL_PREFIX.length);
@@ -23,7 +23,7 @@ const authorizeChannel = async (
     if (!shop || shop.id !== requestedShopId) {
       throw new AppError(
         httpStatus.FORBIDDEN,
-        "You are not allowed to subscribe to this channel."
+        "You are not allowed to subscribe to this channel.",
       );
     }
   } else if (channelName.startsWith(CUSTOMER_CHANNEL_PREFIX)) {
@@ -32,7 +32,7 @@ const authorizeChannel = async (
     if (requestedUserId !== user.userId) {
       throw new AppError(
         httpStatus.FORBIDDEN,
-        "You are not allowed to subscribe to this channel."
+        "You are not allowed to subscribe to this channel.",
       );
     }
   } else {

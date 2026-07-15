@@ -16,10 +16,11 @@ exports.orderServices = void 0;
 const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../Error/AppError"));
-const coupon_service_1 = require("../coupon/coupon.service");
 const prisma_1 = __importDefault(require("../../util/prisma"));
 const pusher_1 = __importDefault(require("../../util/pusher"));
+const coupon_service_1 = require("../coupon/coupon.service");
 const payment_util_1 = require("../payment/payment.util");
+const LOW_STOCK_THRESHOLD = 5;
 // ! for ordering product
 const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const { cartId, couponId } = payload;
@@ -33,6 +34,7 @@ const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Cart is empty");
     }
     const baseTotalPrice = cartItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
+    const lowStockAlerts = [];
     const result = yield prisma_1.default.$transaction((trxnClient) => __awaiter(void 0, void 0, void 0, function* () {
         let discountAmount = 0;
         if (couponId) {
@@ -106,7 +108,7 @@ const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
         });
         // reduce product inventory quantity
         for (const item of cartItems) {
-            yield trxnClient.products.update({
+            const updatedProduct = yield trxnClient.products.update({
                 where: { id: item === null || item === void 0 ? void 0 : item.productId },
                 data: {
                     inventoryCount: {
@@ -114,6 +116,16 @@ const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
                     },
                 },
             });
+            const previousCount = item.product.inventoryCount;
+            if (previousCount > LOW_STOCK_THRESHOLD &&
+                updatedProduct.inventoryCount <= LOW_STOCK_THRESHOLD) {
+                lowStockAlerts.push({
+                    shopId: item.product.shopId,
+                    productId: updatedProduct.id,
+                    productName: item.product.name,
+                    inventoryCount: updatedProduct.inventoryCount,
+                });
+            }
         }
         const userData = yield trxnClient.user.findUnique({
             where: { id: userId },
@@ -145,6 +157,19 @@ const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
     catch (error) {
         // eslint-disable-next-line no-console
         console.error("Pusher new-order trigger failed:", error);
+    }
+    // fire-and-forget: notify each shop of any product that just crossed into low stock.
+    // never let a Pusher failure affect the already-committed order/payment flow.
+    try {
+        yield Promise.all(lowStockAlerts.map((alert) => pusher_1.default.trigger(`private-vendor-${alert.shopId}`, "low-stock", {
+            productId: alert.productId,
+            productName: alert.productName,
+            inventoryCount: alert.inventoryCount,
+        })));
+    }
+    catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Pusher low-stock trigger failed:", error);
     }
     return result;
 });

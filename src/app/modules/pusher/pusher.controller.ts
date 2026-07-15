@@ -10,7 +10,7 @@ const authorizeChannel = catchAsync(async (req, res) => {
   const authResponse = await pusherServices.authorizeChannel(
     socket_id,
     channel_name,
-    req.user
+    req.user,
   );
 
   res.status(200).send(authResponse);

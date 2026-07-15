@@ -1,11 +1,13 @@
 import { OrderStatus, Prisma } from "@prisma/client";
 import httpStatus from "http-status";
 import AppError from "../../Error/AppError";
-import { assertCouponDatesValid } from "../coupon/coupon.service";
 import prisma from "../../util/prisma";
 import pusherServer from "../../util/pusher";
+import { assertCouponDatesValid } from "../coupon/coupon.service";
 import { initPayment } from "../payment/payment.util";
 import { TOrderPayload } from "./order.interface";
+
+const LOW_STOCK_THRESHOLD = 5;
 
 // ! for ordering product
 const orderItem = async (payload: TOrderPayload, userId: string) => {
@@ -25,130 +27,153 @@ const orderItem = async (payload: TOrderPayload, userId: string) => {
 
   const baseTotalPrice = cartItems.reduce(
     (sum, item) => sum + item.quantity * item.price,
-    0
+    0,
   );
 
-  const result = await prisma.$transaction(async (trxnClient) => {
-    let discountAmount = 0;
+  const lowStockAlerts: {
+    shopId: string;
+    productId: string;
+    productName: string;
+    inventoryCount: number;
+  }[] = [];
 
-    if (couponId) {
-      // re-validate inside the transaction — a preview earlier isn't a guarantee at commit time
-      const coupon = await trxnClient.coupon.findFirst({
-        where: { id: couponId, isDeleted: false },
-      });
+  const result = await prisma.$transaction(
+    async (trxnClient) => {
+      let discountAmount = 0;
 
-      if (!coupon) {
-        throw new AppError(httpStatus.NOT_FOUND, "Coupon code not found.");
-      }
-
-      assertCouponDatesValid(coupon);
-
-      // atomic system-wide claim: only succeeds if a slot is still available,
-      // so concurrent checkouts serialize on the row lock instead of over-claiming
-      const claim = await trxnClient.coupon.updateMany({
-        where: { id: couponId, usedCount: { lt: coupon.usageLimit } },
-        data: { usedCount: { increment: 1 } },
-      });
-
-      if (claim.count === 0) {
-        throw new AppError(
-          httpStatus.BAD_REQUEST,
-          "This coupon has reached its maximum usage limit and can no longer be used."
-        );
-      }
-
-      discountAmount = coupon.discountValue;
-    }
-
-    const totalPrice = baseTotalPrice - discountAmount;
-
-    // create order data
-    const order = await trxnClient.order.create({
-      data: {
-        customerId: userId,
-        totalPrice,
-        trxnNumber,
-        couponId: couponId ?? null,
-        discountAmount,
-      },
-    });
-
-    if (couponId) {
-      // atomic per-user claim — the [couponId, userId] unique constraint is the
-      // enforcement point; a violation here rolls back the usedCount increment
-      // and order creation above, together, since it's all one transaction
-      try {
-        await trxnClient.couponUsage.create({
-          data: { couponId, userId, orderId: order.id },
+      if (couponId) {
+        // re-validate inside the transaction — a preview earlier isn't a guarantee at commit time
+        const coupon = await trxnClient.coupon.findFirst({
+          where: { id: couponId, isDeleted: false },
         });
-      } catch (error) {
-        if (
-          error instanceof Prisma.PrismaClientKnownRequestError &&
-          error.code === "P2002"
-        ) {
+
+        if (!coupon) {
+          throw new AppError(httpStatus.NOT_FOUND, "Coupon code not found.");
+        }
+
+        assertCouponDatesValid(coupon);
+
+        // atomic system-wide claim: only succeeds if a slot is still available,
+        // so concurrent checkouts serialize on the row lock instead of over-claiming
+        const claim = await trxnClient.coupon.updateMany({
+          where: { id: couponId, usedCount: { lt: coupon.usageLimit } },
+          data: { usedCount: { increment: 1 } },
+        });
+
+        if (claim.count === 0) {
           throw new AppError(
             httpStatus.BAD_REQUEST,
-            "You have already used this coupon."
+            "This coupon has reached its maximum usage limit and can no longer be used.",
           );
         }
-        throw error;
+
+        discountAmount = coupon.discountValue;
       }
-    }
 
-    // crete order item data
-    const orderItems = cartItems.map((item) => ({
-      orderId: order?.id,
-      productId: item.productId,
-      quantity: item.quantity,
-      price: item.price,
-    }));
+      const totalPrice = baseTotalPrice - discountAmount;
 
-    // create order item
-    await trxnClient.orderItem.createMany({ data: orderItems });
-
-    // delete cart item
-    await trxnClient.cartItem.deleteMany({
-      where: {
-        cartId,
-      },
-    });
-
-    // delete cart
-    await trxnClient.cart.delete({
-      where: {
-        id: cartId,
-      },
-    });
-
-    // reduce product inventory quantity
-    for (const item of cartItems) {
-      await trxnClient.products.update({
-        where: { id: item?.productId },
+      // create order data
+      const order = await trxnClient.order.create({
         data: {
-          inventoryCount: {
-            decrement: item?.quantity,
-          },
+          customerId: userId,
+          totalPrice,
+          trxnNumber,
+          couponId: couponId ?? null,
+          discountAmount,
         },
       });
-    }
 
-    const userData = await trxnClient.user.findUnique({
-      where: { id: userId },
-    });
+      if (couponId) {
+        // atomic per-user claim — the [couponId, userId] unique constraint is the
+        // enforcement point; a violation here rolls back the usedCount increment
+        // and order creation above, together, since it's all one transaction
+        try {
+          await trxnClient.couponUsage.create({
+            data: { couponId, userId, orderId: order.id },
+          });
+        } catch (error) {
+          if (
+            error instanceof Prisma.PrismaClientKnownRequestError &&
+            error.code === "P2002"
+          ) {
+            throw new AppError(
+              httpStatus.BAD_REQUEST,
+              "You have already used this coupon.",
+            );
+          }
+          throw error;
+        }
+      }
 
-    // * initiate payment
-    const tracsactionData = {
-      transactionId: trxnNumber,
-      amount: totalPrice as number,
-      customerName: userData?.username as string,
-      customerEmail: userData?.email as string,
-      userId: userId,
-    };
+      // crete order item data
+      const orderItems = cartItems.map((item) => ({
+        orderId: order?.id,
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.price,
+      }));
 
-    const transactionResult = await initPayment(tracsactionData);
+      // create order item
+      await trxnClient.orderItem.createMany({ data: orderItems });
 
-    return transactionResult;
-  }, { timeout: 20000 });
+      // delete cart item
+      await trxnClient.cartItem.deleteMany({
+        where: {
+          cartId,
+        },
+      });
+
+      // delete cart
+      await trxnClient.cart.delete({
+        where: {
+          id: cartId,
+        },
+      });
+
+      // reduce product inventory quantity
+      for (const item of cartItems) {
+        const updatedProduct = await trxnClient.products.update({
+          where: { id: item?.productId },
+          data: {
+            inventoryCount: {
+              decrement: item?.quantity,
+            },
+          },
+        });
+
+        const previousCount = item.product.inventoryCount;
+        if (
+          previousCount > LOW_STOCK_THRESHOLD &&
+          updatedProduct.inventoryCount <= LOW_STOCK_THRESHOLD
+        ) {
+          lowStockAlerts.push({
+            shopId: item.product.shopId,
+            productId: updatedProduct.id,
+            productName: item.product.name,
+            inventoryCount: updatedProduct.inventoryCount,
+          });
+        }
+      }
+
+      const userData = await trxnClient.user.findUnique({
+        where: { id: userId },
+      });
+
+      // * initiate payment
+      const tracsactionData = {
+        transactionId: trxnNumber,
+        amount: totalPrice as number,
+        customerName: userData?.username as string,
+        customerEmail: userData?.email as string,
+        userId: userId,
+      };
+
+      const transactionResult = await initPayment(tracsactionData);
+
+      return transactionResult;
+    },
+    { timeout: 20000 },
+  );
 
   // fire-and-forget: notify each shop involved in this order of a new order.
   // never let a Pusher failure affect the already-committed order/payment flow.
@@ -157,7 +182,7 @@ const orderItem = async (payload: TOrderPayload, userId: string) => {
 
     if (order) {
       const shopIds = Array.from(
-        new Set(cartItems.map((item) => item.product.shopId))
+        new Set(cartItems.map((item) => item.product.shopId)),
       );
 
       await Promise.all(
@@ -166,13 +191,30 @@ const orderItem = async (payload: TOrderPayload, userId: string) => {
             orderId: order.id,
             trxnNumber: order.trxnNumber,
             totalPrice: order.totalPrice,
-          })
-        )
+          }),
+        ),
       );
     }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Pusher new-order trigger failed:", error);
+  }
+
+  // fire-and-forget: notify each shop of any product that just crossed into low stock.
+  // never let a Pusher failure affect the already-committed order/payment flow.
+  try {
+    await Promise.all(
+      lowStockAlerts.map((alert) =>
+        pusherServer.trigger(`private-vendor-${alert.shopId}`, "low-stock", {
+          productId: alert.productId,
+          productName: alert.productName,
+          inventoryCount: alert.inventoryCount,
+        }),
+      ),
+    );
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Pusher low-stock trigger failed:", error);
   }
 
   return result;
@@ -208,7 +250,7 @@ const getVendorOrderHistory = async (vendorUserId: string) => {
   if (!shop) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Shop not found for this vendor."
+      "Shop not found for this vendor.",
     );
   }
 

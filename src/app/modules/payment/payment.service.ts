@@ -31,7 +31,7 @@ const successfullyPayment = async (payload: any) => {
         orderId: result.id,
         trxnNumber: result.trxnNumber,
         status: result.status,
-      }
+      },
     );
   } catch (error) {
     // eslint-disable-next-line no-console
