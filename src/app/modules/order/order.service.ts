@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import AppError from "../../Error/AppError";
 import { assertCouponDatesValid } from "../coupon/coupon.service";
 import prisma from "../../util/prisma";
+import pusherServer from "../../util/pusher";
 import { initPayment } from "../payment/payment.util";
 import { TOrderPayload } from "./order.interface";
 
@@ -12,9 +13,10 @@ const orderItem = async (payload: TOrderPayload, userId: string) => {
 
   const trxnNumber = `TXN-${Date.now()}`;
 
-  // get cart items
+  // get cart items (product included so we know which shop(s) to notify after order creation)
   const cartItems = await prisma.cartItem.findMany({
     where: { cartId: cartId },
+    include: { product: true },
   });
 
   if (!cartItems.length) {
@@ -147,6 +149,31 @@ const orderItem = async (payload: TOrderPayload, userId: string) => {
 
     return transactionResult;
   }, { timeout: 20000 });
+
+  // fire-and-forget: notify each shop involved in this order of a new order.
+  // never let a Pusher failure affect the already-committed order/payment flow.
+  try {
+    const order = await prisma.order.findFirst({ where: { trxnNumber } });
+
+    if (order) {
+      const shopIds = Array.from(
+        new Set(cartItems.map((item) => item.product.shopId))
+      );
+
+      await Promise.all(
+        shopIds.map((shopId) =>
+          pusherServer.trigger(`private-vendor-${shopId}`, "new-order", {
+            orderId: order.id,
+            trxnNumber: order.trxnNumber,
+            totalPrice: order.totalPrice,
+          })
+        )
+      );
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Pusher new-order trigger failed:", error);
+  }
 
   return result;
 };

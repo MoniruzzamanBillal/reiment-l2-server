@@ -45,6 +45,7 @@
     "nodemon": "^3.1.0",
     "openai": "^6.45.0",
     "prisma": "^6.7.0",
+    "pusher": "^5.3.4",
     "typescript": "^5.4.5",
     "uuid": "^11.0.3",
     "vercel": "^39.2.2",

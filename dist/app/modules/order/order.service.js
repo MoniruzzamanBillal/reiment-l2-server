@@ -18,14 +18,16 @@ const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../Error/AppError"));
 const coupon_service_1 = require("../coupon/coupon.service");
 const prisma_1 = __importDefault(require("../../util/prisma"));
+const pusher_1 = __importDefault(require("../../util/pusher"));
 const payment_util_1 = require("../payment/payment.util");
 // ! for ordering product
 const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const { cartId, couponId } = payload;
     const trxnNumber = `TXN-${Date.now()}`;
-    // get cart items
+    // get cart items (product included so we know which shop(s) to notify after order creation)
     const cartItems = yield prisma_1.default.cartItem.findMany({
         where: { cartId: cartId },
+        include: { product: true },
     });
     if (!cartItems.length) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Cart is empty");
@@ -127,6 +129,23 @@ const orderItem = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
         const transactionResult = yield (0, payment_util_1.initPayment)(tracsactionData);
         return transactionResult;
     }), { timeout: 20000 });
+    // fire-and-forget: notify each shop involved in this order of a new order.
+    // never let a Pusher failure affect the already-committed order/payment flow.
+    try {
+        const order = yield prisma_1.default.order.findFirst({ where: { trxnNumber } });
+        if (order) {
+            const shopIds = Array.from(new Set(cartItems.map((item) => item.product.shopId)));
+            yield Promise.all(shopIds.map((shopId) => pusher_1.default.trigger(`private-vendor-${shopId}`, "new-order", {
+                orderId: order.id,
+                trxnNumber: order.trxnNumber,
+                totalPrice: order.totalPrice,
+            })));
+        }
+    }
+    catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Pusher new-order trigger failed:", error);
+    }
     return result;
 });
 // ! for getting user order

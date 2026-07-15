@@ -1,10 +1,10 @@
 import httpStatus from "http-status";
 import AppError from "../Error/AppError";
 
-import catchAsync from "../util/catchAsync";
+import { UserRole } from "@prisma/client";
 import Jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
-import { UserRole } from "@prisma/client";
+import catchAsync from "../util/catchAsync";
 
 const validateUser = (...requiredRoles: UserRole[]) => {
   return catchAsync(async (req, res, next) => {
@@ -13,7 +13,7 @@ const validateUser = (...requiredRoles: UserRole[]) => {
     if (!header) {
       throw new AppError(
         httpStatus.UNAUTHORIZED,
-        "Authorization header missing or malformed"
+        "Authorization header missing or malformed",
       );
     }
 
@@ -21,12 +21,12 @@ const validateUser = (...requiredRoles: UserRole[]) => {
 
     const decoded = Jwt.verify(
       token,
-      config.jwt_secret as string
+      config.jwt_secret as string,
     ) as JwtPayload;
 
     const { userRole } = decoded;
 
-    if (requiredRoles && !requiredRoles.includes(userRole)) {
+    if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
       return res.status(httpStatus.UNAUTHORIZED).json({
         success: false,
         statusCode: httpStatus.UNAUTHORIZED,
