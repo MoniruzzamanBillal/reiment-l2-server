@@ -14,6 +14,7 @@ const follower_route_1 = require("../modules/follower/follower.route");
 const order_route_1 = require("../modules/order/order.route");
 const payment_route_1 = require("../modules/payment/payment.route");
 const product_route_1 = require("../modules/products/product.route");
+const pusher_route_1 = require("../modules/pusher/pusher.route");
 const review_route_1 = require("../modules/review/review.route");
 const shop_route_1 = require("../modules/shop/shop.route");
 const user_route_1 = require("../modules/user/user.route");
@@ -78,6 +79,10 @@ const routeArray = [
     {
         path: "/ai",
         route: ai_route_1.aiRouter,
+    },
+    {
+        path: "/pusher",
+        route: pusher_route_1.pusherRouter,
     },
 ];
 routeArray.forEach((item) => {

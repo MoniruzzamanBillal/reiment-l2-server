@@ -14,9 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../Error/AppError"));
-const catchAsync_1 = __importDefault(require("../util/catchAsync"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../config"));
+const catchAsync_1 = __importDefault(require("../util/catchAsync"));
 const validateUser = (...requiredRoles) => {
     return (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const header = req.headers.authorization;
@@ -26,7 +26,7 @@ const validateUser = (...requiredRoles) => {
         const token = header === null || header === void 0 ? void 0 : header.split(" ")[1];
         const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_secret);
         const { userRole } = decoded;
-        if (requiredRoles && !requiredRoles.includes(userRole)) {
+        if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
             return res.status(http_status_1.default.UNAUTHORIZED).json({
                 success: false,
                 statusCode: http_status_1.default.UNAUTHORIZED,

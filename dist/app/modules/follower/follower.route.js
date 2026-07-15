@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.followerRouter = void 0;
-const express_1 = require("express");
-const follower_controller_1 = require("./follower.controller");
-const validateUser_1 = __importDefault(require("../../middleware/validateUser"));
 const client_1 = require("@prisma/client");
+const express_1 = require("express");
+const validateUser_1 = __importDefault(require("../../middleware/validateUser"));
+const follower_controller_1 = require("./follower.controller");
 const router = (0, express_1.Router)();
 // ! for getting logged in user follower data
 router.get("/logged-user-data", (0, validateUser_1.default)(client_1.UserRole.CUSTOMER), follower_controller_1.followerController.getLoggedUserData);

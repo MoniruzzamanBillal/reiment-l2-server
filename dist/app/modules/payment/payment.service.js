@@ -17,6 +17,7 @@ const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../Error/AppError"));
 const prisma_1 = __importDefault(require("../../util/prisma"));
+const pusher_1 = __importDefault(require("../../util/pusher"));
 // ! after successfully payment
 const successfullyPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { tran_id, status } = payload;
@@ -31,6 +32,19 @@ const successfullyPayment = (payload) => __awaiter(void 0, void 0, void 0, funct
             status: client_1.OrderStatus.COMPLETED,
         },
     });
+    // fire-and-forget: notify the customer their order status changed.
+    // never let a Pusher failure affect the already-committed payment callback.
+    try {
+        yield pusher_1.default.trigger(`private-customer-${result.customerId}`, "order-status-changed", {
+            orderId: result.id,
+            trxnNumber: result.trxnNumber,
+            status: result.status,
+        });
+    }
+    catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Pusher order-status-changed trigger failed:", error);
+    }
     return result;
     //
 });

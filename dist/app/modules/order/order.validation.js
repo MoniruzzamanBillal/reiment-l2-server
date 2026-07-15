@@ -6,7 +6,7 @@ const zod_1 = require("zod");
 const orderItemValidationSchema = zod_1.z.object({
     body: zod_1.z.object({
         cartId: zod_1.z.string().min(1, "cartId is required."),
-        couponId: zod_1.z.string().optional(),
+        couponId: zod_1.z.string().nullish(),
     }),
 });
 //

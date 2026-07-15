@@ -4,7 +4,7 @@ import { z } from "zod";
 const orderItemValidationSchema = z.object({
   body: z.object({
     cartId: z.string().min(1, "cartId is required."),
-    couponId: z.string().optional(),
+    couponId: z.string().nullish(),
   }),
 });
 

@@ -11,6 +11,7 @@ import { followerRouter } from "../modules/follower/follower.route";
 import { orderRouter } from "../modules/order/order.route";
 import { paymentRouter } from "../modules/payment/payment.route";
 import { productRouter } from "../modules/products/product.route";
+import { pusherRouter } from "../modules/pusher/pusher.route";
 import { reviewRouter } from "../modules/review/review.route";
 import { shopRouter } from "../modules/shop/shop.route";
 import { userRouter } from "../modules/user/user.route";
@@ -77,6 +78,10 @@ const routeArray = [
   {
     path: "/ai",
     route: aiRouter,
+  },
+  {
+    path: "/pusher",
+    route: pusherRouter,
   },
 ];
 

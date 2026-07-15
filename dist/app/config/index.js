@@ -26,4 +26,8 @@ exports.default = {
     SSL_PAYMENT_URL: process.env.SSL_PAYMENT_URL,
     SSL_VALIDATION_URL: process.env.SSL_VALIDATION_URL,
     openRouterApiKey: process.env.openRouterApiKey,
+    PUSHER_APP_ID: process.env.PUSHER_APP_ID,
+    PUSHER_KEY: process.env.PUSHER_KEY,
+    PUSHER_SECRET: process.env.PUSHER_SECRET,
+    PUSHER_CLUSTER: process.env.PUSHER_CLUSTER,
 };
